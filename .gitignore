@@ -1,0 +1,10 @@
+/Debug
+/.vs
+*.opensdf
+*.sdf
+*.obj
+/thirdpart
+/scene
+/Res
+/objs
+/log

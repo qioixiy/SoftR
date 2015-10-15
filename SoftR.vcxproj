@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{415A387B-CAA1-453C-9C2F-EAAF8094859E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>InitDirect3D</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>SoftR</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+    <TargetName>softr</TargetName>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\DXSDK_Jun10\DXSDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>F:\DXSDK_Jun10\DXSDK\Lib\x86;E:\3D\DXStudy\D3D11Study\thirdpart\Image;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FreeImaged.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;dxguid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>d3d11.lib;d3dx11.lib;D3DCompiler.lib;Effects11.lib;dxerr.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="2DRendering.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="D3D11Buffer.cpp" />
+    <ClCompile Include="D3D11CameraSprite.cpp" />
+    <ClCompile Include="D3D11InputElementDesc.cpp" />
+    <ClCompile Include="D3D11RenderTexture.cpp" />
+    <ClCompile Include="D3D11TextureArray.cpp" />
+    <ClCompile Include="d3dApp.cpp" />
+    <ClCompile Include="D3D11Texture.cpp" />
+    <ClCompile Include="D3D11Texture2D.cpp" />
+    <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="GlobalEnv.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="BaseGeometryGenerator.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="RBMath\Src\Color32.cpp" />
+    <ClCompile Include="RBMath\Src\Colorf.cpp" />
+    <ClCompile Include="RBMath\Src\RBMath.cpp" />
+    <ClCompile Include="RBMath\Src\RBMathImpl.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SoftRApp.cpp" />
+    <ClCompile Include="SoftR\BufferBase.cpp" />
+    <ClCompile Include="SoftR\BufferConstant.cpp" />
+    <ClCompile Include="SoftR\BufferIndex.cpp" />
+    <ClCompile Include="SoftR\BufferUnorder.cpp" />
+    <ClCompile Include="SoftR\BufferVertex.cpp" />
+    <ClCompile Include="SoftR\Pipeline.cpp" />
+    <ClCompile Include="SoftR\Rasterizer.cpp" />
+    <ClCompile Include="SoftR\SamplerBase.cpp" />
+    <ClCompile Include="SoftR\SamplePoint.cpp" />
+    <ClCompile Include="SoftR\ShaderBase.cpp" />
+    <ClCompile Include="SoftR\ShaderPixel.cpp" />
+    <ClCompile Include="SoftR\ShaderVertex.cpp" />
+    <ClCompile Include="SoftR\StageBase.cpp" />
+    <ClCompile Include="SoftR\StageGS.cpp" />
+    <ClCompile Include="SoftR\StageIA.cpp" />
+    <ClCompile Include="SoftR\StageOM.cpp" />
+    <ClCompile Include="SoftR\StagePS.cpp" />
+    <ClCompile Include="SoftR\StageVS.cpp" />
+    <ClCompile Include="SoftR\Texture1D.cpp" />
+    <ClCompile Include="SoftR\Texture2D.cpp" />
+    <ClCompile Include="SoftR\Texture3D.cpp" />
+    <ClCompile Include="SoftR\TextureBase.cpp" />
+    <ClCompile Include="SoftR\ViewBase.cpp" />
+    <ClCompile Include="SoftR\ViewRenderTarget.cpp" />
+    <ClCompile Include="SoftR\ViewShaderResource.cpp" />
+    <ClCompile Include="SoftR\ViewUnorderAccess.cpp" />
+    <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="Win32SoftRKey.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="2DRendering.h" />
+    <ClInclude Include="BaseGeometryGenerator.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="D3D11Buffer.h" />
+    <ClInclude Include="D3D11CameraSprite.h" />
+    <ClInclude Include="D3D11InputElementDesc.h" />
+    <ClInclude Include="D3D11Renderer.h" />
+    <ClInclude Include="D3D11RenderTexture.h" />
+    <ClInclude Include="D3D11TextureArray.h" />
+    <ClInclude Include="d3dApp.h" />
+    <ClInclude Include="D3D11Texture.h" />
+    <ClInclude Include="D3D11Texture2D.h" />
+    <ClInclude Include="d3dUtil.h" />
+    <ClInclude Include="Effect.h" />
+    <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="GlobalEnv.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="KeyDefinetions.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="RBMath\Inc\AABB.h" />
+    <ClInclude Include="RBMath\Inc\Axis.h" />
+    <ClInclude Include="RBMath\Inc\Box.h" />
+    <ClInclude Include="RBMath\Inc\Color.h" />
+    <ClInclude Include="RBMath\Inc\Color32.h" />
+    <ClInclude Include="RBMath\Inc\Colorf.h" />
+    <ClInclude Include="RBMath\Inc\Complex.h" />
+    <ClInclude Include="RBMath\Inc\Curves.h" />
+    <ClInclude Include="RBMath\Inc\FFT.h" />
+    <ClInclude Include="RBMath\Inc\Matrix.h" />
+    <ClInclude Include="RBMath\Inc\Plane.h" />
+    <ClInclude Include="RBMath\Inc\Quaternion.h" />
+    <ClInclude Include="RBMath\Inc\RBMath.h" />
+    <ClInclude Include="RBMath\Inc\RBMathBase.h" />
+    <ClInclude Include="RBMath\Inc\RBMathUtilities.h" />
+    <ClInclude Include="RBMath\Inc\RBVectors.h" />
+    <ClInclude Include="RBMath\Inc\Vector2.h" />
+    <ClInclude Include="RBMath\Inc\Vector3.h" />
+    <ClInclude Include="RBMath\Inc\Vector4.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="SoftRApp.h" />
+    <ClInclude Include="SoftR\BaseShaderPS.h" />
+    <ClInclude Include="SoftR\BaseShaderVS.h" />
+    <ClInclude Include="SoftR\BufferBase.h" />
+    <ClInclude Include="SoftR\BufferConstant.h" />
+    <ClInclude Include="SoftR\BufferIndex.h" />
+    <ClInclude Include="SoftR\BufferUnorder.h" />
+    <ClInclude Include="SoftR\BufferVertex.h" />
+    <ClInclude Include="SoftR\InnerData.h" />
+    <ClInclude Include="SoftR\Pipeline.h" />
+    <ClInclude Include="SoftR\Rasterizer.h" />
+    <ClInclude Include="SoftR\SamplePoint.h" />
+    <ClInclude Include="SoftR\SamplerBase.h" />
+    <ClInclude Include="SoftR\ShaderBase.h" />
+    <ClInclude Include="SoftR\ShaderGeometry.h" />
+    <ClInclude Include="SoftR\ShaderPixel.h" />
+    <ClInclude Include="SoftR\ShaderVertex.h" />
+    <ClInclude Include="SoftR\StageBase.h" />
+    <ClInclude Include="SoftR\StageGS.h" />
+    <ClInclude Include="SoftR\StageIA.h" />
+    <ClInclude Include="SoftR\StageOM.h" />
+    <ClInclude Include="SoftR\StagePS.h" />
+    <ClInclude Include="SoftR\StageVS.h" />
+    <ClInclude Include="SoftR\Texture1D.h" />
+    <ClInclude Include="SoftR\Texture2D.h" />
+    <ClInclude Include="SoftR\Texture3D.h" />
+    <ClInclude Include="SoftR\TextureBase.h" />
+    <ClInclude Include="SoftR\VertexFormat.h" />
+    <ClInclude Include="SoftR\ViewBase.h" />
+    <ClInclude Include="SoftR\ViewRenderTarget.h" />
+    <ClInclude Include="SoftR\ViewShaderResouce.h" />
+    <ClInclude Include="SoftR\ViewUnorderAccess.h" />
+    <ClInclude Include="Uitilities.h" />
+    <ClInclude Include="VertexFormats.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

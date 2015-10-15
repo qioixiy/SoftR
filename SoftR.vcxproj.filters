@@ -1,0 +1,453 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{ea1ba20d-a906-4fe9-98bd-8e913f79f9c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap">
+      <UniqueIdentifier>{57f080b0-22d2-416f-bfc1-15cefec79a02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Shader">
+      <UniqueIdentifier>{0bcbdd52-6895-4d0e-a300-b2a4fe277e0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Uti">
+      <UniqueIdentifier>{53ac9f2f-2b2a-4155-8fae-a1873d7652c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{44d3885a-cf80-4a66-8bf8-642b2f40892f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Uti\MathSRC">
+      <UniqueIdentifier>{4f3f4737-bed5-47f8-a8d2-7226b88c163e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Uti\Math">
+      <UniqueIdentifier>{ffa625b9-a00a-4003-9916-285a6ce83247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Uti\Common">
+      <UniqueIdentifier>{6a885e4d-e075-461e-bfae-f0cc088d207b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Uti\Object">
+      <UniqueIdentifier>{85f4e873-7ead-476e-ba63-da4e51b88e2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\D3D11Wrap">
+      <UniqueIdentifier>{f5bde6fd-c367-488c-9374-66bb911ce8c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\D3D11Wrap\D3D11Effects">
+      <UniqueIdentifier>{20e81ff5-13cf-4d60-a8cb-2fc7c4106676}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Utilities">
+      <UniqueIdentifier>{7e77be36-3c1c-418c-af27-e8bdf5cdb4aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="App\SoftR">
+      <UniqueIdentifier>{a8e4d4b7-79d8-4239-bec1-683034426c90}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Uti\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Uti\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Uti\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseGeometryGenerator.cpp">
+      <Filter>Uti\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Platform\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="RBMath\Src\Color32.cpp">
+      <Filter>Uti\MathSRC</Filter>
+    </ClCompile>
+    <ClCompile Include="RBMath\Src\Colorf.cpp">
+      <Filter>Uti\MathSRC</Filter>
+    </ClCompile>
+    <ClCompile Include="RBMath\Src\RBMath.cpp">
+      <Filter>Uti\MathSRC</Filter>
+    </ClCompile>
+    <ClCompile Include="RBMath\Src\RBMathImpl.cpp">
+      <Filter>Uti\MathSRC</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalEnv.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Buffer.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11InputElementDesc.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Texture.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Texture2D.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11RenderTexture.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="2DRendering.cpp">
+      <Filter>Platform\D3D11Wrap\D3D11Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11CameraSprite.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11TextureArray.cpp">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftRApp.cpp">
+      <Filter>App\SoftR</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Win32SoftRKey.cpp">
+      <Filter>App\SoftR</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StageIA.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Pipeline.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Rasterizer.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StagePS.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StageOM.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\BufferBase.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\BufferConstant.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\BufferIndex.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\BufferUnorder.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\BufferVertex.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ShaderBase.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ShaderPixel.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ShaderVertex.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StageBase.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StageGS.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StageVS.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Texture1D.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Texture2D.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Texture3D.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\TextureBase.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewBase.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewRenderTarget.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewShaderResource.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewUnorderAccess.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\SamplePoint.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\SamplerBase.cpp">
+      <Filter>SoftRWrap</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGeometryGenerator.h">
+      <Filter>Uti\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Uti\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Uti\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>Platform\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Platform\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Uti\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Buffer.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalEnv.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11InputElementDesc.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Renderer.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexFormats.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="Uitilities.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dApp.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyDefinetions.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Texture2D.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11RenderTexture.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Texture.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="2DRendering.h">
+      <Filter>Platform\D3D11Wrap\D3D11Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11CameraSprite.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\AABB.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Axis.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Box.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Color.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Color32.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Colorf.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Complex.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Curves.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\FFT.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Matrix.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Plane.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Quaternion.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\RBMath.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\RBMathBase.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\RBMathUtilities.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\RBVectors.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Vector2.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Vector3.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RBMath\Inc\Vector4.h">
+      <Filter>Uti\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11TextureArray.h">
+      <Filter>Platform\D3D11Wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftRApp.h">
+      <Filter>App\SoftR</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\SamplerBase.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderBase.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderGeometry.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderPixel.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderVertex.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageBase.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageGS.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageIA.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageOM.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StagePS.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageVS.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Texture1D.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Texture2D.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Texture3D.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\TextureBase.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\VertexFormat.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewBase.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewRenderTarget.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewShaderResouce.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewUnorderAccess.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferBase.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferConstant.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferIndex.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferUnorder.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferVertex.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Pipeline.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Rasterizer.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\InnerData.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BaseShaderVS.h">
+      <Filter>SoftRWrap\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BaseShaderPS.h">
+      <Filter>SoftRWrap\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\SamplePoint.h">
+      <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>Platform\D3D11Wrap\D3D11Effects</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
