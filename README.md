@@ -127,6 +127,7 @@ Note
 
 Rencently TODO
 =========
+- 渲染至纹理
 - 更高效的shader
 - 双缓存
 -	并行优化
