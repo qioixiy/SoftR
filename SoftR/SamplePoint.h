@@ -22,20 +22,21 @@ public:
 
 
 
-		int x = u*tex->get_width() ;
-		int y = v*tex->get_height() ;
+		int x = u*(tex->get_width() -1);
+		int y = v*(tex->get_height() -1);
 
 		return tex->get_color(x,y);
 	}
 	RBColorf sample_l(const SrTexture2D* tex, float u, float v)
 	{
+		//双线性采样，有奇怪的白点
 		if (u < 0) u = 0;
 		if (u > 1) u = 1;
 		if (v < 0) v = 0;
 		if (v > 1) v = 1;
 
-		float x = u*tex->get_width();
-		float y = v*tex->get_height();
+		float x = u*(tex->get_width()-1);
+		float y = v*(tex->get_height()-1);
 
 		float x0, x1;
 		x0 = floor(x);

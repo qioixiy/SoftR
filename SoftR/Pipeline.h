@@ -6,7 +6,8 @@
 #include "Rasterizer.h"
 #include <vector>
 #include "InnerData.h"
-#include "..\D3D11Texture2D.h"
+#include "../D3D11Texture2D.h"
+#include "../Profiler.h"
 
 
 class SrPipeline
@@ -34,6 +35,9 @@ public:
 	}
 	  
 private:
+
+	Profiler _profler;
+
 	void clear();
 	void _clear_SSBuffer();
 
@@ -53,6 +57,9 @@ private:
 	const SrBufferIndex* _backup_index;
 	SrSSBuffer<RBColor32> _color_buffer;
 	SrSSBuffer<float> _depth_buffer;
+
+	SrSSBuffer<RBColor32> _co_color_buffer;
+	SrSSBuffer<float> _co_depth_buffer;
 
 	SrSSBuffer<RBColor32> _o_color_buffer;
 	SrSSBuffer<float> _o_depth_buffer;

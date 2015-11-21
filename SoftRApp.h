@@ -16,6 +16,7 @@
 #include "SoftR\\Pipeline.h"
 #include "SoftR\\BaseShaderVS.h"
 #include "SoftR\\BaseShaderPS.h"
+#include "SoftR\\SimGPU.h"
 
 struct ShaderMatrixBuffer;
 
@@ -29,6 +30,7 @@ public:
 	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();
+	void Termination();
 	void set_viewport(float ltx, float lty, float w, float h, float min_depth = 0.f, float max_depth = 1.f);
 	void set_depth_state(bool val);
 
@@ -55,7 +57,7 @@ protected:
 	RBMatrix m, v, p;
 
 	RBCamera* cam;
-	RBCamera* cam_sys;
+	RBCamera* cam_d3d;
 
 	int old_x, old_y;
 
@@ -77,4 +79,9 @@ protected:
 	SrTexture2D* tf;
 	ShaderMatrixBuffer* mb;
 
+private:
+	bool _init_platform();
+	bool _init_softr();
+
+	std::thread* t;
 };

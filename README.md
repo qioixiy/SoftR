@@ -33,9 +33,12 @@ SoftRApp中可以设置渲染的模型（目前只支持obj格式）和纹理。
   obj->_node->get_mat(mb->m);
   cam->get_view_matrix(mb->v);
   cam->get_perspective_matrix(mb->p);
-  //使用名字索引shader uniform变量
-  vs->set_constant_buffer("matrix", bf);
-  ps->set_texture("texture", tf);
+  //出于方便使用名字索引shader uniform变量，但是效率及其低下
+  //vs->set_constant_buffer("matrix", bf);
+  //ps->set_texture("texture", tf);
+  //使用数组直接用索引来处理提升50%性能
+  vs->set_constant_buffer_index(0,bf);
+  ps->set_texture_index(0,tf);
   pip->set_ps(ps);
   pip->set_vs(vs);
   //draw call
@@ -64,7 +67,8 @@ public:
 	void shade(VertexP3N3T2& v)
 	{
 		VertexP3N3T2 iv = v;
-		SrBufferConstant* mb = get_cbuffer("matrix");
+		//SrBufferConstant* mb = get_cbuffer("matrix");
+        SrBufferConstant* mb = get_cbuffer_index(0);
 		ShaderMatrixBuffer* cmb = (ShaderMatrixBuffer*)(mb->_data);
 		v.position = iv.position * cmb->m;
 		v.position = v.position * cmb->v;
@@ -84,7 +88,8 @@ class BaseShaderPS : public SrShaderPixel
 public:
 	RBColorf shade(VertexP3N3T2& vert_lerp)
 	{
-		SrTexture2D* tex = get_texture2d("texture");
+		//SrTexture2D* tex = get_texture2d("texture");
+    SrTexture2D* tex = get_texture2d_index(0);
 		SrSamplerPoint sp;
 		RBColorf tc = sp.sample(tex, vert_lerp.text_coord.x, vert_lerp.text_coord.y);
 		vert_lerp.normal.normalize();
@@ -128,9 +133,11 @@ Note
 Rencently TODO
 =========
 - 渲染至纹理
-- 更高效的shader
 - 双缓存
 -	并行优化
+
+  当前默认实现借助C++11使用了非常简单的并行。大概情况是：PS和OM部分全部转移到另外一个线程去处理。但是经过Profile发现有大量的等待时间。原因是：处理线程储存数据的队列出现了生产旺盛，却消费不足的问题。对于一个简单的四棱锥，队列最大长度达到了一万以上。所以实际上使用多线程后，并没有提升多少性能，但是还好没有下降的趋势。多线程目前还需要更多深入的考虑，或许再参考一下其他地方是怎么做的。
+
 - 完美裁剪
 - MSAA
 - 混合

@@ -15,7 +15,7 @@
 #include "RBMath\\Inc\\Color32.h"
 #include "VertexFormats.h"
 #include "SoftR\\Texture2D.h"
-
+#include "SoftR\\SimGPU.h"
 
 SoftRApp::SoftRApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
@@ -24,27 +24,54 @@ SoftRApp::SoftRApp(HINSTANCE hInstance)
 #include "Logger.h"
 SoftRApp::~SoftRApp()
 {
-	g_logger->shutdown();
-	RBclose_log();
-	g_input_manager->shutdown();
-	g_res_manager->shutdown();
+	Termination();
 }
 
 #include "BaseGeometryGenerator.h"
 
-bool SoftRApp::Init()
+bool SoftRApp::_init_platform()
 {
-	g_res_manager->startup();
-	g_input_manager->startup("");
-	g_logger->startup("log/");
-	g_logger->debug_log(WIP_WARNING, "现在运行的是SoftRApp!!!");
-	RBopen_log();
+	bool ret = true;
+
+	ret &= g_res_manager->startup();
+	ret &= g_input_manager->startup("");
+	
 	if (!D3DApp::Init())
 		return false;
 
-	RBlog("Console Test~~\n");
+	cam_d3d = new RBCamera();
+	if (!cam_d3d) return false;
+	cam_d3d->set_position(0, 0, -15);
+	cam_d3d->set_target(RBVector4(0, 0, 0));
+	cam_d3d->set_fov_y(45);
+	cam_d3d->set_ratio(16.f / 9.f);
+	cam_d3d->set_near_panel(0.1f);
+	cam_d3d->set_far_panel(100.f);
+
+	ef = RB2DRenderingEffect::create();
+	if (!ef) return false;
+
+	out_tex = RBD3D11Texture2D::create(35, 20, RBD3D11Texture2D::E_DYNAMIC);
+	//out_tex = RBD3D11Texture2D::create(2, 2, RBD3D11Texture2D::E_TEXTURE, "Res\\right.jpg");
+	out_tex->obj->_node->set_position(0, 0, 0);
+	//out_tex->obj->_node->rotate(0,180,0);
+
+	_sprites.push_back(out_tex);
+
+	return ret;
+}
+
+bool SoftRApp::_init_softr()
+{
+	bool ret = true;
+
+	
+	g_gpu = new SrSimGPU();
+	t = new std::thread([&]{g_gpu->run(); });
+
 
 	cam = new RBCamera();
+	if (!cam) return false;
 	cam->set_position(0, 0, -15);
 	RBVector4 position(0, 0, 0);
 	cam->set_target(position);
@@ -53,32 +80,17 @@ bool SoftRApp::Init()
 	cam->set_near_panel(1.f);
 	cam->set_far_panel(2000.f);
 
-	cam_sys = new RBCamera();
-	cam_sys->set_position(0,0,-15);
-	cam_sys->set_target(RBVector4(0,0,0));
-	cam_sys->set_fov_y(45);
-	cam_sys->set_ratio(16.f/9.f);
-	cam_sys->set_near_panel(0.1f);
-	cam_sys->set_far_panel(100.f);
-
 	set_cam_move_speed(5, 5);
 	set_cam_rotate_speed(1, 1);
 
-	ef = RB2DRenderingEffect::create();
-
-	out_tex = RBD3D11Texture2D::create(35, 20, RBD3D11Texture2D::E_DYNAMIC);
-	//out_tex = RBD3D11Texture2D::create(2, 2, RBD3D11Texture2D::E_TEXTURE, "Res\\right.jpg");
-	out_tex->obj->_node->set_position(0,0,0);
-	//out_tex->obj->_node->rotate(0,180,0);
-
-	_sprites.push_back(out_tex);
-
 	pip = new SrPipeline();
+	if (!pip) return false;
 
 	obj = RBObject::create_object();
-	obj->load_mesh("objs/tri.obj");
+	if (!obj) return false;
+	obj->load_mesh("objs/t.obj");
 	obj->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
-	obj->_node->set_position(0, -1,0);
+	obj->_node->set_position(0, -1, 60);
 	obj->_node->rotate(-30, 195, 0);
 
 	ps = new BaseShaderPS();
@@ -90,23 +102,69 @@ bool SoftRApp::Init()
 	cam->get_view_matrix(mb->v);
 	cam->get_perspective_matrix(mb->p);
 
-	
 	bf = new SrBufferConstant();
 	bf->init(mb, sizeof(ShaderMatrixBuffer));
 
 	tf = SrTexture2D::creat("Res/pp.jpg");
-	
 
+	/*
 	vs->set_constant_buffer("matrix", bf);
 	ps->set_texture("texture", tf);
+	*/
+	vs->set_constant_buffer_index(0,bf);
+	ps->set_texture_index(0,tf);
 	pip->set_ps(ps);
 	pip->set_vs(vs);
 	pip->set_out_tex(out_tex);
 
-	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count()/3);
+	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
+
+	RBlog("现在运行的是SoftRApp!!!\n");
+	g_logger->debug_log(WIP_WARNING, "现在运行的是SoftRApp!!!");
+
+	return ret;
+}
+
+bool SoftRApp::Init()
+{
+	bool ret = true;
+	g_logger->startup("log/");
 	
+	RBopen_log();
+	if (!_init_platform())
+	{
+		g_logger->debug_log(WIP_ERROR, "系统初始化失败！");
+		return false;
+	}
+	if (!_init_softr())
+	{
+		g_logger->debug_log(WIP_ERROR, "SoftR初始化失败！");
+		return false;
+	}
 	//pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
-	return true;
+	return ret;
+}
+
+void SoftRApp::Termination()
+{
+	RBlog("正在清理PS-OM queue中的垃圾.....");
+
+	g_gpu->terminal();
+	if (t->joinable())
+		t->join();
+	delete g_gpu;
+	delete t;
+	delete ps;
+	delete vs;
+	delete mb;
+	delete bf;
+	delete tf;
+	delete pip;
+	g_logger->shutdown();
+	RBclose_log();
+	g_input_manager->shutdown();
+	g_res_manager->shutdown();
+
 }
 
 void SoftRApp::OnResize()
@@ -166,8 +224,7 @@ void SoftRApp::handle_input(float dt)
 
 	cam->rotate_by_axis(val, cam->get_right());
 	RBVector3 f = cam->get_forward();
-	f.normalize();
-	if (down.is_parallel(f, down))
+	if (down.is_parallel(f.get_normalized(), down))
 	{
 		cam->rotate_by_axis(-val, cam->get_right());
 	}
@@ -181,7 +238,7 @@ void SoftRApp::UpdateScene(float dt)
 	//obj->_node->translate(0,dt,0);
 	//obj1->_node->rotate(0,10*dt,0);
 	//obj->_node->rotate(0,10*dt,0);
-	RBVector3 tar = RBVector3(0, 5, -3);
+	//RBVector3 tar = RBVector3(0, 0, 0);
 	//cam->pan(tar,10*dt);
 	//cam->rotate(0,0.1,0);
 
@@ -218,7 +275,7 @@ void SoftRApp::DrawScene()
 	cam->get_perspective_matrix(mb->p);
 	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
 
-	RBD3D11Renderer::render(cam_sys,_sprites,ef);
+	RBD3D11Renderer::render(cam_d3d,_sprites,ef);
 
 	HR(mSwapChain->Present(0, 0));
 

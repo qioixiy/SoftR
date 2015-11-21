@@ -11,9 +11,6 @@
     <Filter Include="SoftRWrap">
       <UniqueIdentifier>{57f080b0-22d2-416f-bfc1-15cefec79a02}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SoftRWrap\Shader">
-      <UniqueIdentifier>{0bcbdd52-6895-4d0e-a300-b2a4fe277e0e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Uti">
       <UniqueIdentifier>{53ac9f2f-2b2a-4155-8fae-a1873d7652c2}</UniqueIdentifier>
     </Filter>
@@ -47,6 +44,36 @@
     </Filter>
     <Filter Include="App\SoftR">
       <UniqueIdentifier>{a8e4d4b7-79d8-4239-bec1-683034426c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Resources">
+      <UniqueIdentifier>{3b0da126-e879-45c9-aa7d-c9205d27bb35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Resources\Buffer">
+      <UniqueIdentifier>{87b96b89-baec-4674-989b-82c2927451ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Resources\Texture">
+      <UniqueIdentifier>{009d0470-daeb-42c1-8edd-4f16f8b39cbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Resources\Shader">
+      <UniqueIdentifier>{46651d6c-5e9e-493a-a160-2c3fded5f17f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Pipline">
+      <UniqueIdentifier>{7359b7df-8897-4980-9211-038b171b7772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Pipline\Stage">
+      <UniqueIdentifier>{80474903-4ece-48ca-8353-62bda6d2d5c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Pipline\Sampler">
+      <UniqueIdentifier>{65cbe795-28ad-4202-8f5f-3c400cab44be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Pipline\View">
+      <UniqueIdentifier>{eea88037-09f5-470b-ae8d-af856e50e774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\Shaders">
+      <UniqueIdentifier>{0bcbdd52-6895-4d0e-a300-b2a4fe277e0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoftRWrap\SimGPU">
+      <UniqueIdentifier>{a7726d3f-6d8f-467c-b896-2d19cd309ebb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -135,83 +162,92 @@
     <ClCompile Include="Win32SoftRKey.cpp">
       <Filter>App\SoftR</Filter>
     </ClCompile>
-    <ClCompile Include="SoftR\StageIA.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\Pipeline.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\Rasterizer.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\StagePS.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\StageOM.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
     <ClCompile Include="SoftR\BufferBase.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\BufferConstant.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\BufferIndex.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\BufferUnorder.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\BufferVertex.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\ShaderBase.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Shader</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\ShaderPixel.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Shader</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\ShaderVertex.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\StageBase.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\StageGS.cpp">
-      <Filter>SoftRWrap</Filter>
-    </ClCompile>
-    <ClCompile Include="SoftR\StageVS.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Shader</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\Texture1D.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Texture</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\Texture2D.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Texture</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\Texture3D.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Texture</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\TextureBase.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Resources\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="SoftR\ViewBase.cpp">
-      <Filter>SoftRWrap</Filter>
+    <ClCompile Include="SoftR\StageBase.cpp">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="SoftR\ViewRenderTarget.cpp">
-      <Filter>SoftRWrap</Filter>
+    <ClCompile Include="SoftR\StageGS.cpp">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="SoftR\ViewShaderResource.cpp">
-      <Filter>SoftRWrap</Filter>
+    <ClCompile Include="SoftR\StageIA.cpp">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="SoftR\ViewUnorderAccess.cpp">
-      <Filter>SoftRWrap</Filter>
+    <ClCompile Include="SoftR\StageOM.cpp">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StagePS.cpp">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\StageVS.cpp">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Pipeline.cpp">
+      <Filter>SoftRWrap\Pipline</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\Rasterizer.cpp">
+      <Filter>SoftRWrap\Pipline</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\SamplePoint.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Pipline\Sampler</Filter>
     </ClCompile>
     <ClCompile Include="SoftR\SamplerBase.cpp">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Pipline\Sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewBase.cpp">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewRenderTarget.cpp">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewShaderResource.cpp">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\ViewUnorderAccess.cpp">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="RBTimer.cpp">
+      <Filter>Uti\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\SimGPU.cpp">
+      <Filter>SoftRWrap\SimGPU</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -353,101 +389,110 @@
     <ClInclude Include="SoftRApp.h">
       <Filter>App\SoftR</Filter>
     </ClInclude>
-    <ClInclude Include="SoftR\SamplerBase.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ShaderBase.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ShaderGeometry.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ShaderPixel.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ShaderVertex.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\StageBase.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\StageGS.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\StageIA.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\StageOM.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\StagePS.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\StageVS.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\Texture1D.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\Texture2D.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\Texture3D.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\TextureBase.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\VertexFormat.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ViewBase.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ViewRenderTarget.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ViewShaderResouce.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\ViewUnorderAccess.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\BufferBase.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\BufferConstant.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\BufferIndex.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\BufferUnorder.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\BufferVertex.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\Pipeline.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\Rasterizer.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\InnerData.h">
-      <Filter>SoftRWrap</Filter>
-    </ClInclude>
     <ClInclude Include="SoftR\BaseShaderVS.h">
-      <Filter>SoftRWrap\Shader</Filter>
+      <Filter>SoftRWrap\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="SoftR\BaseShaderPS.h">
-      <Filter>SoftRWrap\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="SoftR\SamplePoint.h">
-      <Filter>SoftRWrap</Filter>
+      <Filter>SoftRWrap\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>Platform\D3D11Wrap\D3D11Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferBase.h">
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferConstant.h">
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferIndex.h">
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferUnorder.h">
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\BufferVertex.h">
+      <Filter>SoftRWrap\Resources\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderBase.h">
+      <Filter>SoftRWrap\Resources\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderGeometry.h">
+      <Filter>SoftRWrap\Resources\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderPixel.h">
+      <Filter>SoftRWrap\Resources\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ShaderVertex.h">
+      <Filter>SoftRWrap\Resources\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Texture1D.h">
+      <Filter>SoftRWrap\Resources\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Texture2D.h">
+      <Filter>SoftRWrap\Resources\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Texture3D.h">
+      <Filter>SoftRWrap\Resources\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\TextureBase.h">
+      <Filter>SoftRWrap\Resources\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageBase.h">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageGS.h">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageIA.h">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageOM.h">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StagePS.h">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\StageVS.h">
+      <Filter>SoftRWrap\Pipline\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\InnerData.h">
+      <Filter>SoftRWrap\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Pipeline.h">
+      <Filter>SoftRWrap\Pipline</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\Rasterizer.h">
+      <Filter>SoftRWrap\Pipline</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\SamplePoint.h">
+      <Filter>SoftRWrap\Pipline\Sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\SamplerBase.h">
+      <Filter>SoftRWrap\Pipline\Sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\VertexFormat.h">
+      <Filter>SoftRWrap\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewBase.h">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewRenderTarget.h">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewShaderResouce.h">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ViewUnorderAccess.h">
+      <Filter>SoftRWrap\Pipline\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="RBTimer.h">
+      <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\SimGPU.h">
+      <Filter>SoftRWrap\SimGPU</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

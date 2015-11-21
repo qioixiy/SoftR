@@ -16,7 +16,7 @@ public:
 	void shade(VertexP3N3T2& v)
 	{
 		VertexP3N3T2 iv = v;
-		SrBufferConstant* mb = get_cbuffer("matrix");
+		SrBufferConstant* mb = get_cbuffer_index(0);
 		ShaderMatrixBuffer* cmb = (ShaderMatrixBuffer*)(mb->_data);
 
 		//right mult

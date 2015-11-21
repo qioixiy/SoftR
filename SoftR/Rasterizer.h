@@ -4,6 +4,7 @@
 #include "InnerData.h"
 #include <vector>
 #include "..\\RBMath\\Inc\\Color32.h"
+#include "../Profiler.h"
 
 class SrRasterizer
 {
@@ -89,5 +90,7 @@ private:
 	void scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _triangle_fragment);
 
 	void scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev);
+
+	Profiler _prof;
 };
 

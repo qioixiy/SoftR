@@ -611,6 +611,20 @@ public:
 		}
 	}
 
+	RBVector3 get_normalized(f32 tolerance = SMALLER_F)
+	{
+		RBVector3 ret = *this;
+		const f32 s = x*x + y*y + z*z;
+		if (s>tolerance)
+		{
+			const f32 inv_s = RBMath::inv_sqrt(s);
+			ret.x *= inv_s;
+			ret.y *= inv_s;
+			ret.z *= inv_s;
+			return ret;
+		}
+		return RBVector3::zero_vector;
+	}
 	/**
 	 * Checks whether vector is normalized.
 	 *

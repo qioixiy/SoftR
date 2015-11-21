@@ -5,21 +5,28 @@
 class BaseShaderPS : public SrShaderPixel
 {
 public:
+	SrSamplerPoint sp;
+	SrTexture2D* tex;
+	RBColorf tc;
 	RBColorf shade(VertexP3N3T2& vert_lerp)
 	{
-		SrTexture2D* tex = get_texture2d("texture");
-		SrSamplerPoint sp;
-		RBColorf tc = sp.sample(tex, vert_lerp.text_coord.x, vert_lerp.text_coord.y);
+		//¸ßÏûºÄ
+		tex = get_texture2d_index(0);
+		tc = sp.sample(tex, vert_lerp.text_coord.x, vert_lerp.text_coord.y);
 
-
+		
 		vert_lerp.normal.normalize();
 		//vert_lerp.normal = vert_lerp.normal.get_abs();
-
+		
 		RBVector3 v = vert_lerp.position;
 		v = v.get_abs();
 		v.normalize();
 
 		RBVector3 light(-1,-1,-1);
+
+		RBVector3 half = light + v;
+		half.normalize();
+
 		float cost = RBVector3::dot_product(vert_lerp.normal, light);
 
 		RBColorf oc = RBColorf::white;
@@ -36,14 +43,22 @@ public:
 		if (tc.a < 0.0001)
 			RBColorf f = RBColorf::black;
 
+		RBVector4 abt(0.08,0.07,0.08,1.0);
 
-		RBColorf c =outc* tc;
+
+		RBColorf c =outc* tc + abt*tc;
+
+		c.a = RBMath::clamp(c.a, 0.f, 1.f);
+		c.r = RBMath::clamp(c.r, 0.f, 1.f);
+		c.g = RBMath::clamp(c.g, 0.f, 1.f);
+		c.b = RBMath::clamp(c.b, 0.f, 1.f);
 		//if (tc.r < 0.0001&&tc.g < 0.0001&&tc.b < 0.0001&&tc.a < 1)
 			//c = RBColorf::black;
 		//c = RBVector4(vert_lerp.normal, 1);
 		//c = RBColorf::red;
 
 		return c;
+		
 	}
 
 private:

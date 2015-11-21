@@ -1,21 +1,37 @@
 #include "Pipeline.h"
+#include "SimGPU.h"
 
 void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex & index_buffer, int num_tri)
 {
 
 	//_backup_index = &index_buffer;
 	//_backup_vertex = &vertex_buffer;
+
+	_profler.set_begin();
 	_stage_ia->proccess(vertex_buffer, index_buffer, _triangles, num_tri);
+	_profler.set_end(Profiler::e_ia); _profler.set_begin();
 	_stage_vs->proccess(_triangles);
+	_profler.set_end(Profiler::e_vs); _profler.set_begin();
 	_stage_gs->proccess();
+	_profler.set_end(Profiler::e_gs); _profler.set_begin();
 	_resterizer->near_far_cull(_triangles, _triangles_near_far_cull);
+	_profler.set_end(Profiler::e_nfc); _profler.set_begin();
 	_resterizer->back_cull(_triangles_near_far_cull, _triangles_back_cull);
+	_profler.set_end(Profiler::e_bc); _profler.set_begin();
 	_resterizer->clip(_triangles_back_cull, _triangles_clip);
+	_profler.set_end(Profiler::e_clip); //_profler.set_begin();
 	_resterizer->triangle_setup(_triangles_clip, _triangles_fragments);
+	//_profler.set_end(Profiler::e_tsp); 
+	
+	g_gpu->finish_pass();
+	_profler.set_begin();
+	g_gpu->wait();
+	_profler.set_end(Profiler::e_tsp);
+
 	//_resterizer->shade(_triangles_fragments);
 	//_triangles_fragments:px.position.w = c.a;px.normal.x = c.r;px.normal.y = c.g;px.normal.z = c.b;
 	//_resterizer->merge(_triangles_fragments,_color_buffer,_depth_buffer);
-
+	_profler.out_put_after_time(20);
 	_show_buffer(_out_tex);
 
 	clear();
@@ -34,6 +50,8 @@ void SrPipeline::_clear_SSBuffer()
 
 SrPipeline::SrPipeline()
 {
+	_profler.init();
+
 	_backup_index = 0;
 	_backup_vertex = 0;
 	_stage_ia = new SrStageIA();
@@ -46,6 +64,10 @@ SrPipeline::SrPipeline()
 
 	_depth_buffer.init(w,h);
 	_color_buffer.init(w,h);
+
+	_co_depth_buffer.init(w, h);
+	_co_color_buffer.init(w, h);
+
 	_o_depth_buffer.init(w, h);
 	_o_color_buffer.init(w, h);
 	_o_depth_buffer.set_vals(1.1);
@@ -55,6 +77,8 @@ SrPipeline::SrPipeline()
 
 	_resterizer->set_depth_buffer(&_depth_buffer);
 	_resterizer->set_color_buffer(&_color_buffer);
+
+	g_gpu->set_container(&_color_buffer,&_depth_buffer);
 }
 
 SrPipeline::~SrPipeline()

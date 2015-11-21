@@ -2,12 +2,19 @@
 #include "../RBMath/Inc/RBMathBase.h"
 #include<math.h>
 #include "..\\Uitilities.h"
+#include "SimGPU.h"
+
 
 SrRasterizer::SrRasterizer()
 {
+	_prof.init();
+
 	_viewport_h = _viewport_w = 0;
 	_stage_ps = new SrStagePS();
 	_stage_om = new SrStageOM();
+
+	g_gpu->set_stage(_stage_ps,_stage_om);
+
 }
 
 SrRasterizer::~SrRasterizer()
@@ -221,6 +228,7 @@ void SrRasterizer::clip(std::vector<SrTriangle*> _triangles, std::vector<SrTrian
 
 void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vector<SrFragment*>& _triangles_fragments)
 {
+	_prof.set_begin();
 	for (auto tri : _triangles)
 	{
 		//把坐标转换到视口
@@ -308,11 +316,13 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 		}
 
 	}
+	_prof.set_end(0);
+	//_prof.out_put_after_time(20);
 }
 
 void SrRasterizer::shade(std::vector<SrFragment*>& _triangles_fragments)
 {
-	_stage_ps->proccess(_triangles_fragments);
+	//_stage_ps->proccess(_triangles_fragments);
 }
 
 
@@ -1102,12 +1112,14 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 		}
 		//RBlog("line\n");
 	}
-
+	
 	//_triangles_fragments.push_back(frg);
 }
 
+
 void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 {
+	_prof.set_begin();
 	sv.position.x = ceil(sv.position.x - 0.5);
 	ev.position.x = ceil(ev.position.x - 0.5);
 	//RBlog("line\n");
@@ -1121,19 +1133,35 @@ void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 	{
 		t = loop_x / dx;
 
+		_prof.set_begin();
 		VertexP3N3T2 v;
 		v.position = _lerp_position(sv.position, ev.position, t);
 		v.position.x = sv.position.x + loop_x;
 		v.position.y = int(sv.position.y - 0.5);
 		v.normal = _lerp_normal(sv.normal, ev.normal, t);
 		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);
+		_prof.set_end(5);
 
-
+		/*
+		//TODO：合并此两个阶段并行化
+		_prof.set_begin();
+		_prof.set_begin();
+		//std::thread t([&]{_stage_ps->proccess(v); });
+		//t.detach();
+		//t.join();
 		_stage_ps->proccess(v);
+		//SrStagePS::proccess(v);
+		_prof.set_end(3);
+		_prof.set_begin();
 		_stage_om->proccess(v, *_color_buffer, *_depth_buffer);
-
-
+		_prof.set_end(4);
+		_prof.set_end(2);
+		*/
+		_prof.set_begin();
+		g_gpu->access(false,v);
+		_prof.set_end(2);
 	}
+	_prof.set_end(1);
 }
 
 void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _triangle_fragment)

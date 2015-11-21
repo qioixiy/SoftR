@@ -3,6 +3,7 @@
 #include "..\\ResourceManager.h"
 #include "..\\Uitilities.h"
 #include "..\\RBMath\\Inc\Colorf.h"
+#include "..\\Logger.h"
 
 class SrTexture2D
 {
@@ -32,15 +33,18 @@ public:
 	RBColorf get_color(int x,int y) const
 	{
 		int index = y*_w*4 + x*4;
-		if (index<_size)
+		if (index < _size)
 		{
 			RBColorf c;
-			c.r = _data[index]/255.f;
-			c.g = _data[index + 1]/255.f;
-			c.b = _data[index + 2]/255.f;
-			c.a = _data[index + 3]/255.f;
+			c.r = _data[index] / 255.f;
+			c.g = _data[index + 1] / 255.f;
+			c.b = _data[index + 2] / 255.f;
+			c.a = _data[index + 3] / 255.f;
 			return c;
 		}
+		else
+			g_logger->debug_log(WIP_WARNING, "Texture %d :Index out of texture 2d:%d/%d¡ª¡ªx:%d/%d::y:%d/%d",this, index,_size,x,_w,y,_h);
+		
 	}
 
 	unsigned int get_width() const

@@ -15,7 +15,7 @@ public:
 	~SrStagePS();
 	void input(SrBufferVertex& vertex_buffer,SrBufferIndex& index_buffer);
 	void output();
-	void proccess(std::vector<SrFragment*>& _triangles_fragments);
+	//void proccess(std::vector<SrFragment*>& _triangles_fragments);
 	void proccess(VertexP3N3T2& px);
 	void set_pixel_shader(SrShaderPixel* ps)
 	{

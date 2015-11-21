@@ -115,10 +115,12 @@
     <ClCompile Include="BaseGeometryGenerator.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="RBMath\Src\Color32.cpp" />
     <ClCompile Include="RBMath\Src\Colorf.cpp" />
     <ClCompile Include="RBMath\Src\RBMath.cpp" />
     <ClCompile Include="RBMath\Src\RBMathImpl.cpp" />
+    <ClCompile Include="RBTimer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SoftRApp.cpp" />
@@ -134,6 +136,7 @@
     <ClCompile Include="SoftR\ShaderBase.cpp" />
     <ClCompile Include="SoftR\ShaderPixel.cpp" />
     <ClCompile Include="SoftR\ShaderVertex.cpp" />
+    <ClCompile Include="SoftR\SimGPU.cpp" />
     <ClCompile Include="SoftR\StageBase.cpp" />
     <ClCompile Include="SoftR\StageGS.cpp" />
     <ClCompile Include="SoftR\StageIA.cpp" />
@@ -175,6 +178,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="RBMath\Inc\AABB.h" />
     <ClInclude Include="RBMath\Inc\Axis.h" />
     <ClInclude Include="RBMath\Inc\Box.h" />
@@ -194,6 +198,7 @@
     <ClInclude Include="RBMath\Inc\Vector2.h" />
     <ClInclude Include="RBMath\Inc\Vector3.h" />
     <ClInclude Include="RBMath\Inc\Vector4.h" />
+    <ClInclude Include="RBTimer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SoftRApp.h" />
@@ -213,6 +218,7 @@
     <ClInclude Include="SoftR\ShaderGeometry.h" />
     <ClInclude Include="SoftR\ShaderPixel.h" />
     <ClInclude Include="SoftR\ShaderVertex.h" />
+    <ClInclude Include="SoftR\SimGPU.h" />
     <ClInclude Include="SoftR\StageBase.h" />
     <ClInclude Include="SoftR\StageGS.h" />
     <ClInclude Include="SoftR\StageIA.h" />

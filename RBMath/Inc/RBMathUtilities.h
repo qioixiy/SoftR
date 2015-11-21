@@ -297,11 +297,11 @@ struct RBMath : public RBBaseMath
 
 
 	///** Clamps X to be between Min and Max, inclusive */
-	//template< class T > 
-	//static FORCEINLINE T Clamp( const T X, const T Min, const T Max )
-	//{
-	//	return X<Min ? Min : X<Max ? X : Max;
-	//}
+	template< class T > 
+	static FORCEINLINE T clamp( const T X, const T Min, const T Max )
+	{
+		return X<Min ? Min : X<Max ? X : Max;
+	}
 
 	///** Snaps a value to the nearest grid multiple */
 	//static FORCEINLINE f32 GridSnap( f32 Location, f32 Grid )

@@ -30,8 +30,11 @@ void SrStageOM::proccess(VertexP3N3T2& px, SrSSBuffer<RBColor32>& color, SrSSBuf
 		RBColor32 c(px.normal.x * 255, px.normal.y * 255, px.normal.z * 255, px.position.w * 255);
 		color.set_data(round(px.position.x) + color.w*0.5, -round(px.position.y) + color.h*0.5, c);
 	}
+	/*
+	//强制禁用深度测试
 	RBColor32 c(px.normal.x * 255, px.normal.y * 255, px.normal.z * 255, px.position.w * 255);
 	color.set_data(round(px.position.x) + color.w*0.5, -round(px.position.y) + color.h*0.5, c);
+	*/
 }
 
 SrStageOM::SrStageOM()
