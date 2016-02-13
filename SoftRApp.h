@@ -83,5 +83,5 @@ private:
 	bool _init_platform();
 	bool _init_softr();
 
-	std::thread* t;
+	int _index;
 };

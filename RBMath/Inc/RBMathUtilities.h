@@ -201,6 +201,11 @@ struct RBMath : public RBBaseMath
 		return a*a;
 	}
 
+	static f32 round_f(f32 val)
+	{
+		
+		return static_cast<f32>(static_cast<int>(val>0?(val + 0.5):(val-0.5)));
+	}
 
 	///** Return a uniformly distributed random unit length vector = point on the unit sphere surface. */
 	//static RBVector3 VRand();

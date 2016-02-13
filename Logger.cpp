@@ -1,12 +1,12 @@
 #include "Logger.h"
 #include <time.h>
-WIPLogger * WIPLogger::_instance = 0;
 WIPLogger::WIPLogger()
 {
 	m_initialized = false;
 }
 WIPLogger* WIPLogger::get_instance()
 {
+	static WIPLogger* _instance = nullptr;
 	if(!_instance)
 		_instance = new WIPLogger();
 	return _instance;
@@ -25,7 +25,6 @@ void WIPLogger::shutdown()
 	m_initialized = false;
 	outfile<<_buf.data();
 	outfile.close();
-	delete _instance;
 }
 
 void WIPLogger::flush()
@@ -84,7 +83,7 @@ void WIPLogger::parse_flags(unsigned int flag)
 	}
 }
 
-void WIPLogger::debug_log(unsigned int flags,char* buffer,...)
+void WIPLogger::debug_log(unsigned int flags,const char* buffer,...)
 {		
 	if(!m_initialized)
 		return;
@@ -108,11 +107,23 @@ void WIPLogger::debug_log(unsigned int flags,char* buffer,...)
 
 
 }
-void WIPLogger::debug_print(unsigned int flags,char* buffer,...)
+void WIPLogger::debug_print(unsigned int flags,const char* buffer,...)
 {
 	parse_flags(flags);
 	printf(_current_line.data());
 	printf(" ");
+	va_list vl;
+
+	va_start(vl,buffer);
+	vprintf(buffer,vl);
+	va_end(vl);
+	printf("\n");
+
+	fflush(stdout);
+}
+
+void WIPLogger::debug_print(const char* buffer,...)
+{
 	va_list vl;
 
 	va_start(vl,buffer);

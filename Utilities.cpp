@@ -1,5 +1,6 @@
 #include "Uitilities.h"
 #include "Windows.h"
+#include "Logger.h"
 
 void RBopen_log()
 {
@@ -8,11 +9,11 @@ void RBopen_log()
 
 
 void RBlog(const char* strbuf)
-{
-	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	unsigned long lgsize;
-	WriteFile(hOutput, strbuf, strlen(strbuf), &lgsize, 0);
-	
+{	
+	if(g_logger->isInitialized())
+	{
+		g_logger->debug_print(strbuf);
+	}
 }
 
 void RBclose_log()

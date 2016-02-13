@@ -1,6 +1,6 @@
 #include "Rasterizer.h"
 #include "../RBMath/Inc/RBMathBase.h"
-#include<math.h>
+#include <math.h>
 #include "..\\Uitilities.h"
 #include "SimGPU.h"
 
@@ -13,8 +13,22 @@ SrRasterizer::SrRasterizer()
 	_stage_ps = new SrStagePS();
 	_stage_om = new SrStageOM();
 
-	g_gpu->set_stage(_stage_ps,_stage_om);
+}
 
+SrRasterizer::SrRasterizer(SrSimGPU * gpu)
+{
+	_prof.init();
+
+	_viewport_h = _viewport_w = 0;
+	_stage_ps = new SrStagePS();
+	_stage_om = new SrStageOM();
+
+	for (int i = 0; i < SrSimGPU::thread_num; ++i)
+	{
+		gpu->set_stage(i, _stage_ps, _stage_om);
+	}
+
+	_gpu = gpu;
 }
 
 SrRasterizer::~SrRasterizer()
@@ -29,12 +43,12 @@ void SrRasterizer::set_viewport_shape(float w, float h)
 	_viewport_h = h;
 }
 
-void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_near_far_cull)
+void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_near_far_cull,int n)
 {
 	//xyz除以w，但是保留w为z
-	for (auto tri : _triangles)
-	{
-		
+			for(auto tri : _triangles)
+			{
+
 		float inv_w = 1.f / tri->v[0].position.w;
 		float x1 = tri->v[0].position.x * inv_w;
 		float y1 = tri->v[0].position.y * inv_w;
@@ -228,7 +242,7 @@ void SrRasterizer::clip(std::vector<SrTriangle*> _triangles, std::vector<SrTrian
 
 void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vector<SrFragment*>& _triangles_fragments)
 {
-	_prof.set_begin();
+	//_prof.set_begin();
 	for (auto tri : _triangles)
 	{
 		//把坐标转换到视口
@@ -316,7 +330,7 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 		}
 
 	}
-	_prof.set_end(0);
+	//_prof.set_end(0);
 	//_prof.out_put_after_time(20);
 }
 
@@ -864,30 +878,30 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 
 		float tempt = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 		ph.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
-		ph.position.y = round(ph.position.y);
+		ph.position.y = RBMath::round_f(ph.position.y);
 		ph.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
 		ph.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 		ph1.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
-		ph1.position.y = round(ph1.position.y);
+		ph1.position.y = RBMath::round_f(ph1.position.y);
 		ph1.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
 		ph1.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[1].position.y - tri->v[0].position.y);
 		p11.position = _lerp_position(tri->v[0].position, tri->v[1].position, tempt);
-		p11.position.y = round(p11.position.y);
+		p11.position.y = RBMath::round_f(p11.position.y);
 		p11.normal = _lerp_normal(tri->v[0].normal, tri->v[1].normal, tempt);
 		p11.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[1].text_coord, tri->v[1].position.w, tempt);
 
 		tempt = (tri->v[2].position.y - 1 - ph.position.y) / (y2 - ph.position.y);
 		p21.position = _lerp_position(ph.position, tri->v[2].position, tempt);
-		p21.position.y = round(p21.position.y );
+		p21.position.y = RBMath::round_f(p21.position.y );
 		p21.normal = _lerp_normal(ph.normal, tri->v[2].normal, tempt);
 		p21.text_coord = _lerp_uv(ph.text_coord, ph.position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		p22.position = _lerp_position(tri->v[1].position, tri->v[2].position, tempt);
-		p22.position.y = round(p22.position.y );
+		p22.position.y = RBMath::round_f(p22.position.y );
 		p22.normal = _lerp_normal(tri->v[1].normal, tri->v[2].normal, tempt);
 		p22.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
@@ -1000,30 +1014,30 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 
 		float tempt = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 		ph.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
-		ph.position.y = round(ph.position.y );
+		ph.position.y =  RBMath::round_f(ph.position.y );
 		ph.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
 		ph.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 		ph1.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
-		ph1.position.y = round(ph1.position.y);
+		ph1.position.y = RBMath::round_f(ph1.position.y);
 		ph1.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
 		ph1.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[1].position.y - tri->v[0].position.y);
 		p11.position = _lerp_position(tri->v[0].position, tri->v[1].position, tempt);
-		p11.position.y = round(p11.position.y);
+		p11.position.y = RBMath::round_f(p11.position.y);
 		p11.normal = _lerp_normal(tri->v[0].normal, tri->v[1].normal, tempt);
 		p11.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[1].text_coord, tri->v[1].position.w, tempt);
 
 		tempt = (tri->v[2].position.y - 1 - ph.position.y) / (y2 - ph.position.y);
 		p21.position = _lerp_position(ph.position, tri->v[2].position, tempt);
-		p21.position.y = round(p21.position.y);
+		p21.position.y = RBMath::round_f(p21.position.y);
 		p21.normal = _lerp_normal(ph.normal, tri->v[2].normal, tempt);
 		p21.text_coord = _lerp_uv(ph.text_coord, ph.position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		p22.position = _lerp_position(tri->v[1].position, tri->v[2].position, tempt);
-		p22.position.y = round(p22.position.y);
+		p22.position.y = RBMath::round_f(p22.position.y);
 		p22.normal = _lerp_normal(tri->v[1].normal, tri->v[2].normal, tempt);
 		p22.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
@@ -1114,12 +1128,12 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 	}
 	
 	//_triangles_fragments.push_back(frg);
+
 }
 
 
 void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 {
-	_prof.set_begin();
 	sv.position.x = ceil(sv.position.x - 0.5);
 	ev.position.x = ceil(ev.position.x - 0.5);
 	//RBlog("line\n");
@@ -1133,35 +1147,37 @@ void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 	{
 		t = loop_x / dx;
 
-		_prof.set_begin();
 		VertexP3N3T2 v;
+		//插值消耗了一半的时间 14 total
+		//1~2
 		v.position = _lerp_position(sv.position, ev.position, t);
+		//2~3
 		v.position.x = sv.position.x + loop_x;
 		v.position.y = int(sv.position.y - 0.5);
+		//~2
 		v.normal = _lerp_normal(sv.normal, ev.normal, t);
-		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);
-		_prof.set_end(5);
-
+		//~2
+		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);		
+		
 		/*
-		//TODO：合并此两个阶段并行化
-		_prof.set_begin();
-		_prof.set_begin();
-		//std::thread t([&]{_stage_ps->proccess(v); });
-		//t.detach();
-		//t.join();
+		//~7
 		_stage_ps->proccess(v);
-		//SrStagePS::proccess(v);
-		_prof.set_end(3);
-		_prof.set_begin();
+		//~3
 		_stage_om->proccess(v, *_color_buffer, *_depth_buffer);
-		_prof.set_end(4);
-		_prof.set_end(2);
 		*/
-		_prof.set_begin();
-		g_gpu->access(false,v);
-		_prof.set_end(2);
+
+		_gpu->write_min(v);
+		/*
+		int s0 = _gpu->gauss_size(0);
+		int s1 = _gpu->gauss_size(1);
+		int s2 = _gpu->gauss_size(2);
+		int s3 = _gpu->gauss_size(3);
+		int index = s0 > s1 ? 1 : 0;
+		int index1 = s2 > s3 ? 3 : 2;
+		index = _gpu->gauss_size(index) > _gpu->gauss_size(index1) ? index1 : index;
+		_gpu->write(index, v);
+		*/
 	}
-	_prof.set_end(1);
 }
 
 void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _triangle_fragment)

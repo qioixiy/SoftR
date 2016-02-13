@@ -42,7 +42,6 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 	md3dDevice(0),
 	md3dImmediateContext(0),
 	mSwapChain(0),
-	mDepthStencilBuffer(0),
 	mRenderTargetView(0),
 	mDepthStencilView(0)
 {
@@ -54,6 +53,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 	gd3dApp = this;
 }
 
+
 D3DApp::~D3DApp()
 {
 	mSwapChain->SetFullscreenState(FALSE,0);
@@ -61,7 +61,6 @@ D3DApp::~D3DApp()
 	ReleaseCOM(mRenderTargetView);
 	ReleaseCOM(mDepthStencilView);
 	ReleaseCOM(mSwapChain);
-	ReleaseCOM(mDepthStencilBuffer);
 
 	// Restore all default settings.
 	if( md3dImmediateContext )
@@ -176,7 +175,7 @@ void D3DApp::OnResize()
 
 	ReleaseCOM(mRenderTargetView);
 	ReleaseCOM(mDepthStencilView);
-	ReleaseCOM(mDepthStencilBuffer);
+
 
 
 	// Resize the swap chain and recreate the render target view.
@@ -216,10 +215,10 @@ void D3DApp::OnResize()
 	depthStencilDesc.CPUAccessFlags = 0; 
 	depthStencilDesc.MiscFlags      = 0;
 	
-
+	ID3D11Texture2D* mDepthStencilBuffer;
 	HR(md3dDevice->CreateTexture2D(&depthStencilDesc, 0, &mDepthStencilBuffer));
 	HR(md3dDevice->CreateDepthStencilView(mDepthStencilBuffer, 0, &mDepthStencilView));
-
+	ReleaseCOM(mDepthStencilBuffer);
 
 	// Bind the render target view and depth/stencil view to the pipeline.
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "../RBMath/Inc/Vector4.h"
 #include "VertexFormat.h"
+#include "../Mem/MemoryPool.h"
 #include <vector>
 
 struct SrTriangle
@@ -13,6 +14,29 @@ struct SrTriangle
 		v[1] = v2;
 		v[2] = v3;
 	}
+
+	//IAÌáÉý6±¶
+	static void* operator new(size_t size)
+	{
+		return pool->alloc(&nodes,size);
+	}
+
+	static void operator delete(void* p)
+	{
+		pool->free(&nodes,p,sizeof(SrTriangle));
+	}
+	
+	static bool Init()
+	{
+		pool = RBPoolAllctor::instance();
+		nodes = nullptr;
+		pool->new_pool(&nodes,sizeof(SrTriangle));
+		return true;
+	}
+
+	static void* nodes;
+	static RBPoolAllctor* pool;
+
 };
 
 

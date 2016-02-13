@@ -10,10 +10,11 @@ public:
 	RBColorf tc;
 	RBColorf shade(VertexP3N3T2& vert_lerp)
 	{
+		
 		//¸ßÏûºÄ
 		tex = get_texture2d_index(0);
 		tc = sp.sample(tex, vert_lerp.text_coord.x, vert_lerp.text_coord.y);
-
+		//tc = RBColorf::white;
 		
 		vert_lerp.normal.normalize();
 		//vert_lerp.normal = vert_lerp.normal.get_abs();
@@ -52,13 +53,13 @@ public:
 		c.r = RBMath::clamp(c.r, 0.f, 1.f);
 		c.g = RBMath::clamp(c.g, 0.f, 1.f);
 		c.b = RBMath::clamp(c.b, 0.f, 1.f);
+		
 		//if (tc.r < 0.0001&&tc.g < 0.0001&&tc.b < 0.0001&&tc.a < 1)
 			//c = RBColorf::black;
 		//c = RBVector4(vert_lerp.normal, 1);
-		//c = RBColorf::red;
 
-		return c;
 		
+		return c;
 	}
 
 private:

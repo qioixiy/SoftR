@@ -8,107 +8,231 @@
 #include "StagePS.h"
 #include <condition_variable>
 #include "..\\Logger.h"
+#include "..\\ProducerConsumerQueue.h"
+#include "../RBMath/Inc/Color32.h"
 
+/*
+保序问题，透明物体渲染http://zhuanlan.zhihu.com/sildenafil/20180902
+http ://graphics.cs.cmu.edu/courses/15869/fall2014/article/1
+*/
+
+
+void func();
 class SrSimGPU
 {
 public:
-	SrSimGPU()
+	struct DataPak
 	{
-		done = false;
-		ter = false;
-		total = 0;
+		DataPak(size_t queue_size):queue(queue_size),color(nullptr),depth(nullptr),_stage_om(nullptr),_stage_ps(nullptr),
+		ter(false),done(false),total(0){}
+		folly::ProducerConsumerQueue<VertexP3N3T2> queue;
+		SrSSBuffer<RBColor32>* color;
+		SrSSBuffer<float>* depth;
+		SrStagePS* _stage_ps;
+		SrStageOM* _stage_om;
+		bool ter;
+		bool done;
+		int total;
+		void set_container(SrSSBuffer<RBColor32>* color, SrSSBuffer<float>* depth)
+		{
+			this->color = color;
+			this->depth = depth;
+		}
+		void set_stage(SrStagePS* stage_ps, SrStageOM* stage_om)
+		{
+			_stage_om = stage_om;
+			_stage_ps = stage_ps;
+		}
+	};
+	SrSimGPU(size_t queue_size)
+	{
+
+		for (int i = 0; i < thread_num; ++i)
+		{
+			dtpks[i] = new DataPak(queue_size);
+			t[i] = std::thread(&SrSimGPU::run,dtpks[i]);
+		}
+
 	}
 	~SrSimGPU()
 	{
-
-	}
-
-	void set_container(SrSSBuffer<RBColor32>* color,SrSSBuffer<float>* depth)
-	{
-		this->color = color;
-		this->depth = depth;
-	}
-
-	void access(bool read, VertexP3N3T2& data)
-	{
-		lock_queue.lock();
-		if (read)
+		for (int i = 0; i < thread_num;++i)
 		{
-			data = queue.front();
-			queue.pop_front();
+			//delete dtpks[i];
+			t[i].detach();
 		}
-		else
-		{
-			queue.push_back(data);
-		}
-		lock_queue.unlock();
 	}
 
-	void set_stage(SrStagePS* _stage_ps,SrStageOM* _stage_om)
+	//写入最小长度的queue
+	void write_min(VertexP3N3T2& data)
 	{
-		this->_stage_ps = _stage_ps;
-		this->_stage_om = _stage_om;
+		int min = MAX_I32;
+		int min_i = 3;
+		for (int i = 0; i < thread_num; ++i)
+		{
+			int cur = dtpks[i]->queue.sizeGuess();
+			if (cur < min)
+			{
+				min = cur;
+				min_i = i;
+			}
+		}
+		write(min_i,data);
 	}
 
-	void finish_pass()
+	inline void write(int index,const VertexP3N3T2& data)
+	{
+		dtpks[index]->queue.write(data);
+	}
+
+
+	void set_stage(int index,SrStagePS* _stage_ps,SrStageOM* _stage_om)
+	{
+		dtpks[index]->set_stage(_stage_ps, _stage_om);
+	}
+
+	void set_container(int index,SrSSBuffer<RBColor32>* color, SrSSBuffer<float>* depth)
+	{
+		dtpks[index]->set_container(color, depth);
+	}
+
+	inline void finish_pass(int index)
 	{
 		VertexP3N3T2 v;
 		v.finish = true;
-		access(false,v);
+		write(index,v);
+	}
+
+	void finish_all_pass()
+	{
+		for (int i = 0; i < thread_num; ++i)
+		{
+			finish_pass(i);
+		}
+	}
+
+	inline int gauss_size(int index)
+	{
+		return dtpks[index]->queue.sizeGuess();
 	}
 
 	void wait()
 	{
-		while (!done);
-		done = false;
+		for (int i = 0; i < thread_num; ++i)
+		{
+			while (!dtpks[i]->done);
+			//printf("Thread %d finished!\n",i);
+			dtpks[i]->done = false;
+		}
+		//printf("=========\n");
 	}
 
-	void run()
+	static void run(DataPak* s)
 	{
-		while (!ter)
+		//s可能会被析构
+		while (!s->ter)
 		{
-			if (queue.empty()) 
-				continue;
+			
 			VertexP3N3T2 v;
-			access(true,v);
-			if (!v.finish)
+			if (s->queue.read(v))
 			{
-				if (queue.size() > total)
-					total = queue.size();
-				_stage_ps->proccess(v);
-				_stage_om->proccess(v, *color, *depth);
-				
+
+				s->done = false;
+				if (s->queue.sizeGuess() > s->total)
+					s->total = s->queue.sizeGuess();
+				s->_stage_ps->proccess(v);
+				s->_stage_om->proccess(v, *(s->color), *(s->depth));
+
+
 			}
 			else
 			{
-				
-				//g_pass_done.notify_one();
-				done = true;
+				s->done = true;
+				continue;
 			}
+
 		}
-		std::deque<VertexP3N3T2>().swap(queue);
-		g_logger->debug_log(WIP_INFO, "Queue Num:%d", total);
+		printf("Queue Num : %d\n",s->total);
+		//g_logger->debug_print(WIP_INFO, "Queue Num:%d", s->total);
+	}
+
+	inline void terminal(int index)
+	{
+		dtpks[index]->ter = true;
 	}
 
 	void terminal()
 	{
-		ter = true;
+		for (int i = 0; i < thread_num; ++i)
+		{
+			dtpks[i]->ter = true;
+		}
+
 	}
+
+	void merge_result_color(SrSSBuffer<RBColor32>& out)
+	{
+		for (int i = 0; i < out.h; ++i)
+		{
+			for (int j = 0; j < out.w; ++j)
+			{
+				int index = _get_min_depth_index(j,i);
+				out.set_data(j,i,dtpks[index]->color->get_data(j, i));
+			}
+		}
+	}
+
+	void merge_result_depth(SrSSBuffer<float>& out)
+	{
+		for (int i = 0; i < out.h; ++i)
+		{
+			for (int j = 0; j < out.w; ++j)
+			{
+				out.set_data(j, i, _get_min_depth(j, i));
+			}
+		}
+	}
+
+	static const int thread_num = 2;
 private:
-	std::mutex lock_queue;
-	//可能使用std::queue
-	std::deque<VertexP3N3T2> queue;
-	SrSSBuffer<RBColor32>* color;
-	SrSSBuffer<float>* depth;
-	SrStagePS* _stage_ps;
-	SrStageOM* _stage_om;
-	bool done;
+	//std::mutex lock_queue;
+	//std::deque<VertexP3N3T2> queue;
+	
 	std::mutex mu;
 	std::condition_variable g_pass_done;
-	bool ter;
-	//std::thread& t;
+	
+	std::thread t[thread_num];
+	DataPak* dtpks[thread_num];
 
-	int total;
+	int _get_min_depth_index(int x,int y)
+	{
+		float min = MAX_F32;
+		int min_i = 0;
+		for (int i = 0; i < thread_num; ++i)
+		{
+			float cur = dtpks[i]->depth->get_data(x,y);
+			if (cur < min)
+			{
+				min = cur;
+				min_i = i;
+			}
+		}
+		return min_i;
+	}
+
+	int _get_min_depth(int x, int y)
+	{
+		float min = MAX_F32;
+		int min_i = 0;
+		for (int i = 0; i < thread_num; ++i)
+		{
+			float cur = dtpks[i]->depth->get_data(x, y);
+			if (cur < min)
+			{
+				min = cur;
+				min_i = i;
+			}
+		}
+		return min;
+	}
 };
-
-extern SrSimGPU* g_gpu;

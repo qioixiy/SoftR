@@ -6,15 +6,17 @@
 #include "..\\RBMath\\Inc\\Color32.h"
 #include "../Profiler.h"
 
+class SrSimGPU;
 class SrRasterizer
 {
 public:
 	SrRasterizer();
+	SrRasterizer(SrSimGPU* gpu);
 	~SrRasterizer();
 
 	void set_viewport_shape(float w,float h);
 
-	void near_far_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_near_far_cull);
+	void near_far_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_near_far_cull,int n);
 	//À≥ ±’Î
 	void back_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_back_cull);
 	void clip(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_clip);
@@ -92,5 +94,7 @@ private:
 	void scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev);
 
 	Profiler _prof;
+
+	SrSimGPU* _gpu;
 };
 

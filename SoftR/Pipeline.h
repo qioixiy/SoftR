@@ -8,7 +8,7 @@
 #include "InnerData.h"
 #include "../D3D11Texture2D.h"
 #include "../Profiler.h"
-
+#include "SimGPU.h"
 
 class SrPipeline
 {
@@ -25,8 +25,10 @@ public:
 
 	void set_ps(SrShaderPixel* ps)
 	{
-		_resterizer->set_ps(ps);
+		_rasterizer->set_ps(ps);
 	}
+
+	inline void show_buffer_index(int index) { _bfidx = index; }
 
 	//inner use
 	void set_out_tex(RBD3D11Texture2D* out_tex)
@@ -34,6 +36,7 @@ public:
 		_out_tex = out_tex;
 	}
 	  
+
 private:
 
 	Profiler _profler;
@@ -41,12 +44,12 @@ private:
 	void clear();
 	void _clear_SSBuffer();
 
-	void _show_buffer(RBD3D11Texture2D* out_tex);
+	void _show_buffer(int index,RBD3D11Texture2D* out_tex);
 
 	SrStageIA* _stage_ia;
 	SrStageVS* _stage_vs;
 	SrStageGS* _stage_gs;
-	SrRasterizer* _resterizer;
+	SrRasterizer* _rasterizer;
 
 	std::vector<SrTriangle*> _triangles;
 	std::vector<SrTriangle*> _triangles_near_far_cull;
@@ -58,10 +61,23 @@ private:
 	SrSSBuffer<RBColor32> _color_buffer;
 	SrSSBuffer<float> _depth_buffer;
 
+
+	//thread
+	std::vector<SrSSBuffer<RBColor32>* > _color_buffers;
+	std::vector<SrSSBuffer<float>* > _depth_buffers;
+
+	//useless
 	SrSSBuffer<RBColor32> _co_color_buffer;
 	SrSSBuffer<float> _co_depth_buffer;
 
+	//origin
 	SrSSBuffer<RBColor32> _o_color_buffer;
 	SrSSBuffer<float> _o_depth_buffer;
 	RBD3D11Texture2D* _out_tex;
+
+	//threads
+	SrSimGPU s1;
+
+	int _bfidx;
+
 };

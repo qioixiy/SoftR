@@ -9,11 +9,11 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
- 
+
 #include <d3dx11.h>
 //#include "d3dx11Effect.h"
 //#include <xnamath.h>
-#include <dxerr.h>
+//#include <dxerr.h>
 #include <cassert>
 #include <ctime>
 #include <algorithm>
@@ -28,23 +28,10 @@
 // Simple d3d error checker for book demos.
 //---------------------------------------------------------------------------------------
 
-#if defined(DEBUG) | defined(_DEBUG)
-	#ifndef HR
-	#define HR(x)                                              \
-	{                                                          \
-		HRESULT hr = (x);                                      \
-		if(FAILED(hr))                                         \
-		{                                                      \
-			DXTrace(__FILE__, (DWORD)__LINE__, hr, L#x, true); \
-		}                                                      \
-	}
-	#endif
 
-#else
 	#ifndef HR
 	#define HR(x) (x)
 	#endif
-#endif 
 
 
 //---------------------------------------------------------------------------------------

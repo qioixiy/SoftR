@@ -1,5 +1,5 @@
 #include "Shader.h"
-#include "dxerr.h"
+//#include "dxerr.h"
 #include "D3DCompiler.h"
 #include <iostream>
 #include <fstream>
@@ -32,7 +32,7 @@ bool RBShaderBase::load(std::string file_name,std::string entry_name,std::string
 		}
 		if(err)
 		{
-			DXTRACE_ERR_MSGBOX(DXGetErrorDescription(hr),hr);
+			//DXTRACE_ERR_MSGBOX(DXGetErrorDescription(hr),hr);
 		}
 		return false;
 	}

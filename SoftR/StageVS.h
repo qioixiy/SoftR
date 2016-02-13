@@ -14,7 +14,7 @@ public:
 	~SrStageVS();
 	void input(SrBufferVertex& vertex_buffer, SrBufferIndex& index_buffer);
 	void output(SrBufferVertex& vertex_buffer);
-	void proccess(std::vector<SrTriangle*>& triangles)
+	void proccess(std::vector<SrTriangle*>& triangles,int n)
 	{
 		if (!_vs) return;
 		for (auto i : triangles)

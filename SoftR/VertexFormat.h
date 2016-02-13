@@ -3,6 +3,7 @@
 #include "..\\RBMath\\Inc\\Vector3.h"
 #include "..\\RBMath\\Inc\\Colorf.h"
 
+
 struct VertexP3N3C4
 {
 	RBVector4 position;

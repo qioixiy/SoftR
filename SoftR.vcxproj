@@ -22,7 +22,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -51,6 +51,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\Microsoft DirectX SDK %28June 2010%29\Include;;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -59,12 +61,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>F:\DXSDK_Jun10\DXSDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\DXSDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\DXSDK_Jun10\DXSDK\Lib\x86;E:\3D\DXStudy\D3D11Study\thirdpart\Image;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\DXSDK\Lib\x86;.\thirdpart\Image;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>FreeImaged.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;dxguid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -87,11 +89,12 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>d3d11.lib;d3dx11.lib;D3DCompiler.lib;Effects11.lib;dxerr.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dx11.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;FreeImaged.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\DXSDK\Lib\x86;.\thirdpart\Image;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -111,6 +114,11 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mem\MemoryFrame.cpp" />
+    <ClCompile Include="Mem\MemoryManager.cpp" />
+    <ClCompile Include="Mem\MemoryPool.cpp" />
+    <ClCompile Include="Mem\test.cpp" />
+    <ClCompile Include="Mem\Trace.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="BaseGeometryGenerator.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -129,6 +137,7 @@
     <ClCompile Include="SoftR\BufferIndex.cpp" />
     <ClCompile Include="SoftR\BufferUnorder.cpp" />
     <ClCompile Include="SoftR\BufferVertex.cpp" />
+    <ClCompile Include="SoftR\InnerData.cpp" />
     <ClCompile Include="SoftR\Pipeline.cpp" />
     <ClCompile Include="SoftR\Rasterizer.cpp" />
     <ClCompile Include="SoftR\SamplerBase.cpp" />
@@ -175,9 +184,19 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="KeyDefinetions.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Mem\Assertion.h" />
+    <ClInclude Include="Mem\ATEST.h" />
+    <ClInclude Include="Mem\IMemory.h" />
+    <ClInclude Include="Mem\MemoryFrame.h" />
+    <ClInclude Include="Mem\MemoryManager.h" />
+    <ClInclude Include="Mem\MemoryPool.h" />
+    <ClInclude Include="Mem\RBBasedata.h" />
+    <ClInclude Include="Mem\Trace.h" />
+    <ClInclude Include="Mem\WindowsPlatformTemp.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="ProducerConsumerQueue.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="RBMath\Inc\AABB.h" />
     <ClInclude Include="RBMath\Inc\Axis.h" />
@@ -209,6 +228,7 @@
     <ClInclude Include="SoftR\BufferIndex.h" />
     <ClInclude Include="SoftR\BufferUnorder.h" />
     <ClInclude Include="SoftR\BufferVertex.h" />
+    <ClInclude Include="SoftR\GPUMemory.h" />
     <ClInclude Include="SoftR\InnerData.h" />
     <ClInclude Include="SoftR\Pipeline.h" />
     <ClInclude Include="SoftR\Rasterizer.h" />

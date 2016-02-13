@@ -75,6 +75,9 @@
     <Filter Include="SoftRWrap\SimGPU">
       <UniqueIdentifier>{a7726d3f-6d8f-467c-b896-2d19cd309ebb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MemTOUSE">
+      <UniqueIdentifier>{9736624c-10e4-4fc1-80f0-3edc8ce1098c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -248,6 +251,24 @@
     </ClCompile>
     <ClCompile Include="SoftR\SimGPU.cpp">
       <Filter>SoftRWrap\SimGPU</Filter>
+    </ClCompile>
+    <ClCompile Include="Mem\MemoryFrame.cpp">
+      <Filter>MemTOUSE</Filter>
+    </ClCompile>
+    <ClCompile Include="Mem\MemoryManager.cpp">
+      <Filter>MemTOUSE</Filter>
+    </ClCompile>
+    <ClCompile Include="Mem\MemoryPool.cpp">
+      <Filter>MemTOUSE</Filter>
+    </ClCompile>
+    <ClCompile Include="Mem\test.cpp">
+      <Filter>MemTOUSE</Filter>
+    </ClCompile>
+    <ClCompile Include="Mem\Trace.cpp">
+      <Filter>MemTOUSE</Filter>
+    </ClCompile>
+    <ClCompile Include="SoftR\InnerData.cpp">
+      <Filter>SoftRWrap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -493,6 +514,39 @@
     </ClInclude>
     <ClInclude Include="SoftR\SimGPU.h">
       <Filter>SoftRWrap\SimGPU</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\GPUMemory.h">
+      <Filter>SoftRWrap\SimGPU</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\Assertion.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\ATEST.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\IMemory.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\MemoryFrame.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\MemoryManager.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\MemoryPool.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\RBBasedata.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\Trace.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem\WindowsPlatformTemp.h">
+      <Filter>MemTOUSE</Filter>
+    </ClInclude>
+    <ClInclude Include="ProducerConsumerQueue.h">
+      <Filter>Uti\Common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
