@@ -12,7 +12,7 @@ SrRasterizer::SrRasterizer()
 	_viewport_h = _viewport_w = 0;
 	_stage_ps = new SrStagePS();
 	_stage_om = new SrStageOM();
-
+	_total_frag = 0;
 }
 
 SrRasterizer::SrRasterizer(SrSimGPU * gpu)
@@ -23,12 +23,13 @@ SrRasterizer::SrRasterizer(SrSimGPU * gpu)
 	_stage_ps = new SrStagePS();
 	_stage_om = new SrStageOM();
 
-	for (int i = 0; i < SrSimGPU::thread_num; ++i)
+	for (int i = 0; i < thread_num; ++i)
 	{
 		gpu->set_stage(i, _stage_ps, _stage_om);
 	}
 
 	_gpu = gpu;
+	_total_frag = 0;
 }
 
 SrRasterizer::~SrRasterizer()
@@ -226,6 +227,8 @@ void SrRasterizer::back_cull(std::vector<SrTriangle*> _triangles, std::vector<Sr
 		}
 		else
 		{
+			//_triangles_back_cull.push_back(tri);
+
 			continue;
 		}
 	}
@@ -939,7 +942,8 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
 
-			scan_line(vs, ve);
+			if(scan_line(vs, ve))
+				return;
 
 			xs += dx_left_02;
 			xe += dx_right_01;
@@ -974,7 +978,8 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[1].normal, p22.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
 
-			scan_line(vs, ve);
+			if(scan_line(vs, ve))
+				return;
 
 			xs += dx_left_02;
 			xe += dx_right_12;
@@ -1085,7 +1090,8 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
 
-			scan_line(ve, vs);
+			if(scan_line(ve, vs))
+				return;
 
 			xs += dx_right_02;
 			xe += dx_left_01;
@@ -1119,7 +1125,8 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[1].normal, p22.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
 
-			scan_line(ve, vs);
+			if (scan_line(ve, vs))
+				return;
 
 			xs += dx_right_02;
 			xe += dx_left_12;
@@ -1132,13 +1139,13 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 }
 
 
-void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
+bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 {
 	sv.position.x = ceil(sv.position.x - 0.5);
 	ev.position.x = ceil(ev.position.x - 0.5);
 	//RBlog("line\n");
 	if (!RBMath::is_nearly_equal(ev.position.y, sv.position.y))
-		return;
+		return false;
 
 	float t = 0;
 	float dx = ev.position.x - sv.position.x + 1;
@@ -1159,14 +1166,34 @@ void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 		//~2
 		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);		
 		
-		/*
+		
 		//~7
-		_stage_ps->proccess(v);
+		//_stage_ps->proccess(v);
 		//~3
-		_stage_om->proccess(v, *_color_buffer, *_depth_buffer);
-		*/
+		//_stage_om->proccess(v, *_color_buffer, *_depth_buffer);
+		
 
+		//如果帧率太低直接跳过不处理
+
+		//
+		_total_frag++;
+
+		
+#define OP
+#ifdef OP
+		if (_last_ts_time < 120)
+		{
+			_gpu->write_min(v);
+			continue;
+		}
+		else
+		{
+			return true;
+		}
+#else
 		_gpu->write_min(v);
+#endif
+
 		/*
 		int s0 = _gpu->gauss_size(0);
 		int s1 = _gpu->gauss_size(1);
@@ -1178,6 +1205,7 @@ void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 		_gpu->write(index, v);
 		*/
 	}
+	return false;
 }
 
 void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _triangle_fragment)

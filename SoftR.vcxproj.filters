@@ -476,9 +476,6 @@
     <ClInclude Include="SoftR\StageVS.h">
       <Filter>SoftRWrap\Pipline\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="SoftR\InnerData.h">
-      <Filter>SoftRWrap\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="SoftR\Pipeline.h">
       <Filter>SoftRWrap\Pipline</Filter>
     </ClInclude>
@@ -547,6 +544,9 @@
     </ClInclude>
     <ClInclude Include="ProducerConsumerQueue.h">
       <Filter>Uti\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\InnerData.h">
+      <Filter>SoftRWrap</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

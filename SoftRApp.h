@@ -72,6 +72,7 @@ protected:
 
 
 	RBObject* obj;
+	RBObject* obj1;
 	SrPipeline* pip;
 	BaseShaderPS* ps;
 	BaseShaderVS* vs;

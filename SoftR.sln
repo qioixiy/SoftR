@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftR", "SoftR.vcxproj", "{415A387B-CAA1-453C-9C2F-EAAF8094859E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JmxRSoft", "..\JmxRSoft\JmxRSoft.vcxproj", "{0C5ADD4F-23AB-48B0-BEAF-092D128A2AB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{415A387B-CAA1-453C-9C2F-EAAF8094859E}.Debug|Win32.Build.0 = Debug|Win32
 		{415A387B-CAA1-453C-9C2F-EAAF8094859E}.Release|Win32.ActiveCfg = Release|Win32
 		{415A387B-CAA1-453C-9C2F-EAAF8094859E}.Release|Win32.Build.0 = Release|Win32
+		{0C5ADD4F-23AB-48B0-BEAF-092D128A2AB5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0C5ADD4F-23AB-48B0-BEAF-092D128A2AB5}.Debug|Win32.Build.0 = Debug|Win32
+		{0C5ADD4F-23AB-48B0-BEAF-092D128A2AB5}.Release|Win32.ActiveCfg = Release|Win32
+		{0C5ADD4F-23AB-48B0-BEAF-092D128A2AB5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

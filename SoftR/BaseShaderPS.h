@@ -5,12 +5,12 @@
 class BaseShaderPS : public SrShaderPixel
 {
 public:
-	SrSamplerPoint sp;
-	SrTexture2D* tex;
-	RBColorf tc;
+	//作为成员变量线程不安全！
 	RBColorf shade(VertexP3N3T2& vert_lerp)
 	{
-		
+		SrSamplerPoint sp;
+		SrTexture2D* tex;
+		RBColorf tc;
 		//高消耗
 		tex = get_texture2d_index(0);
 		tc = sp.sample(tex, vert_lerp.text_coord.x, vert_lerp.text_coord.y);
@@ -23,7 +23,7 @@ public:
 		v = v.get_abs();
 		v.normalize();
 
-		RBVector3 light(-1,-1,-1);
+		RBVector3 light(0,1,0);
 
 		RBVector3 half = light + v;
 		half.normalize();
@@ -57,7 +57,6 @@ public:
 		//if (tc.r < 0.0001&&tc.g < 0.0001&&tc.b < 0.0001&&tc.a < 1)
 			//c = RBColorf::black;
 		//c = RBVector4(vert_lerp.normal, 1);
-
 		
 		return c;
 	}

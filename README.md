@@ -132,6 +132,7 @@ Note
 
 Rencently TODO
 =========
+- 添加一个帧率太低就直接discard，并且记录下来的功能
 - 各个部件的Release测试
 - 线程安全处理
 - 新的并行模式
@@ -160,6 +161,8 @@ Rencetly Update
 -	添加多线程支持，在scanline阶段之后程序并行，暂时考虑为片元处理为并行，这种方法还要解决多线程结果merge的问题，如果逐像素merge消耗太高，不实际，不如直接对原buffer进行加锁读取，还有一种考虑是实现一个无锁的SSBuffer。还有一种方案是图元并行，这种方法应该更加高效简单
 -	Release模式无法运行无法测试，需要修改，其中FreeImage运行出错，怀疑是编译器版本不对
 
+**2016/2/14**
+-	使用while语句同步，这句同步在Release会被优化，所以Release优化已关闭
 
 Platform Dependences
 ========

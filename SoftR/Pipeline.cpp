@@ -31,14 +31,14 @@ void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex 
 	
 
 	_profler.set_begin();
-	s1.wait();
+	int f1 = s1.wait();
 	_profler.set_end("WAIT");
 
 	//其他的靠谱merge方法！
-	_profler.set_begin();
-	s1.merge_result_color(_color_buffer);
-	s1.merge_result_depth(_depth_buffer);
-	_profler.set_end("Merge");
+	//_profler.set_begin();
+	//s1.merge_result_color(_color_buffer);
+	//s1.merge_result_depth(_depth_buffer);
+	//_profler.set_end("Merge");
 	/*多线程打开
 	g_gpu->finish_pass();
 	_profler.set_begin();
@@ -49,11 +49,23 @@ void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex 
 	//_triangles_fragments:px.position.w = c.a;px.normal.x = c.r;px.normal.y = c.g;px.normal.z = c.b;
 	//_rasterizer->merge(_triangles_fragments,_color_buffer,_depth_buffer);
 	_profler.out_put_after_time(20);
-
+	_rasterizer->set_last_ts_time(_profler.get_time());
 
 	_show_buffer(_bfidx,_out_tex);
 
-	clear();
+	_clear();
+
+	int f2 = _rasterizer->get_total();
+
+	
+	if (f1 != f2)
+	{
+		printf("Diff:%d\n", f2 - f1);
+		//return;
+	}
+	//s1.print_write_num();
+	s1.clear_write_num();
+	_rasterizer->clear_total();
 }
 
 void SrPipeline::_show_buffer(int index,RBD3D11Texture2D* out_tex)
@@ -70,14 +82,14 @@ void SrPipeline::_clear_SSBuffer()
 	memcpy(&_depth_buffer.get_buffer()[0], &_o_depth_buffer.get_buffer()[0], _depth_buffer.size);
 
 	//多线程
-	for (int i = 0; i < SrSimGPU::thread_num; ++i)
+	for (int i = 0; i < thread_num; ++i)
 	{
 		memcpy(&_color_buffers[i]->get_buffer()[0], &_o_color_buffer.get_buffer()[0], _color_buffers[i]->size);
 		memcpy(&_depth_buffers[i]->get_buffer()[0], &_o_depth_buffer.get_buffer()[0], _depth_buffers[i]->size);
 	}
 }
 
-#define MAX_QUEUE_SIZE 1024
+#define MAX_QUEUE_SIZE 10240000
 SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 {
 	_bfidx = 0;
@@ -89,6 +101,7 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 	*/
 
 	_profler.init();
+	_profler.set_output_inter(10);
 
 	SrTriangle::Init();
 
@@ -100,8 +113,8 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 	//多线程
 	//_rasterizer = new SrRasterizer();
 	_rasterizer = new SrRasterizer(&s1);
-	int w = 1280;
-	int h = 720;
+	int w = 1920;
+	int h = 1080;
 	_rasterizer->set_viewport_shape(w, h);
 
 	_depth_buffer.init(w,h);
@@ -109,7 +122,7 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 
 
 	//多线程
-	for (int i = 0; i < SrSimGPU::thread_num; ++i)
+	for (int i = 0; i < thread_num; ++i)
 	{
 		auto cbf = new SrSSBuffer<RBColor32>;
 		auto dbf = new SrSSBuffer<float>;
@@ -117,7 +130,8 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 		dbf->init(w,h);
 		_depth_buffers.push_back(dbf);
 		_color_buffers.push_back(cbf);
-		s1.set_container(i,cbf,dbf);
+		//s1.set_container(i,cbf,dbf);
+		s1.set_container(i,&_color_buffer,&_depth_buffer);
 	}
 
 	_co_depth_buffer.init(w, h);
@@ -141,7 +155,7 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 
 SrPipeline::~SrPipeline()
 {
-	for (int i = 0; i < SrSimGPU::thread_num; ++i)
+	for (int i = 0; i < thread_num; ++i)
 	{
 		delete _depth_buffers[i];
 		delete _color_buffers[i];
@@ -151,16 +165,24 @@ SrPipeline::~SrPipeline()
 	delete _stage_vs;
 	delete _stage_ia;
 	s1.terminal();
+#ifndef POOL
+	SrTriangle::Deinit();
+#endif
 }
 
-void SrPipeline::clear()
+void SrPipeline::_clear()
 {	
 	//这行防止无休止释放内存，暂时代码，以后使用垃圾回收器集中处理	
+#ifdef POOL
 	for (auto& tri : _triangles)
 	{
 		delete tri;
 		tri  = nullptr;
 	}
+#else
+	SrTriangle::ReleaseAll();
+#endif
+
 
 	_triangles.clear();
 	_triangles_near_far_cull.clear();
@@ -168,9 +190,6 @@ void SrPipeline::clear()
 	_triangles_clip.clear();
 	_triangles_fragments.clear();
 	
-	//批量修改内存，下列函数非常耗时
-	//_color_buffer.set_vals(0.f);
-	//_depth_buffer.set_vals(1.1f);
-	_clear_SSBuffer();
+
 
 }

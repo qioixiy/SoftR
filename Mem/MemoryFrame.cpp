@@ -61,7 +61,7 @@ void* RBFrameAlloctor::alloc(size_t tsize,MPOS tpos)
 		printf("动态内存分配不足！即将退出！\n");
 		getchar();
 #endif
-		exit(0);
+		//exit(0);
 		//仅仅测试
 		return NULL;
 	}
@@ -116,7 +116,7 @@ void RBFrameAlloctor::release(MemoryFrame& mf)
 		{
 			_pframe_cap = mf.memory_ptr;
 		}
-		mf.memory_ptr = NULL;
+		//mf.memory_ptr = NULL;
 	}
 }
 

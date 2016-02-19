@@ -2,8 +2,10 @@
 #include "../RBMath/Inc/Vector4.h"
 #include "VertexFormat.h"
 #include "../Mem/MemoryPool.h"
+#include "../Mem/MemoryFrame.h"
 #include <vector>
-
+#include <mutex>
+//#define POOL
 struct SrTriangle
 {
 	VertexP3N3T2 v[3];
@@ -15,27 +17,63 @@ struct SrTriangle
 		v[2] = v3;
 	}
 
-	//IAÌáÉý6±¶
 	static void* operator new(size_t size)
 	{
-		return pool->alloc(&nodes,size);
+
+#ifdef POOL
+		return pool->alloc(&nodes, size);
+#else
+		return frame->alloc(size, false);
+#endif
+
+
 	}
 
 	static void operator delete(void* p)
 	{
-		pool->free(&nodes,p,sizeof(SrTriangle));
+#ifdef POOL
+
+
+		pool->free(&nodes, p, sizeof(SrTriangle));
+#endif
 	}
 	
 	static bool Init()
 	{
+#ifdef POOL
 		pool = RBPoolAllctor::instance();
 		nodes = nullptr;
-		pool->new_pool(&nodes,sizeof(SrTriangle));
+		pool->new_pool(&nodes, sizeof(SrTriangle));
+#else   
+
+		frame = new RBFrameAlloctor();
+		//20M
+		frame->init((1 << 20)*20);
+		frame->getframe(me, false);
+#endif
 		return true;
 	}
 
+#ifndef POOL
+	static void ReleaseAll()
+	{
+		frame->release(me);
+	}
+
+	static void Deinit()
+	{
+		frame->shutdown();
+		frame = nullptr;
+	}
+#endif
+
+#ifdef POOL
 	static void* nodes;
 	static RBPoolAllctor* pool;
+#else
+	static MemoryFrame me;
+	static RBFrameAlloctor* frame;
+#endif
 
 };
 
@@ -77,6 +115,7 @@ struct SrSSBuffer
 
 	void set_data(int x,int y,T data)
 	{
+		std::lock_guard<std::mutex> lk(lock);
 		int index = y*w + x;
 		if (index<_buffer.size())
 		{
@@ -115,4 +154,5 @@ struct SrSSBuffer
 
 private:
 	std::vector<T> _buffer;
+	std::mutex lock;
 };

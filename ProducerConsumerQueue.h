@@ -75,6 +75,13 @@ struct ProducerConsumerQueue {
     std::free(records_);
   }
 
+  void clear(){
+
+	  readIndex_.store(0, std::memory_order_release);
+	  writeIndex_.store(0, std::memory_order_release);
+
+  }
+
   template<class ...Args>
   bool write(Args&&... recordArgs) {
     auto const currentWrite = writeIndex_.load(std::memory_order_relaxed);

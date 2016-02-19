@@ -55,9 +55,14 @@ public:
 	{
 		_color_buffer = buf;
 	}
+	inline void clear_total() { _total_frag = 0; }
+	inline int get_total() { return _total_frag; }
+	inline void set_last_ts_time(float t) { _last_ts_time = t; }
 private:
 	SrStagePS* _stage_ps;
 	SrStageOM* _stage_om;
+
+	float _last_ts_time;
 
 	float _viewport_w;
 	float _viewport_h;
@@ -91,10 +96,13 @@ private:
 	//线扫+插值
 	void scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _triangle_fragment);
 
-	void scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev);
+	//如果跳过返回true
+	bool scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev);
 
 	Profiler _prof;
 
 	SrSimGPU* _gpu;
+
+	int _total_frag;
 };
 

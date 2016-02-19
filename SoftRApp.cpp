@@ -66,11 +66,6 @@ bool SoftRApp::_init_softr()
 {
 	bool ret = true;
 
-	/*多线程开启
-	g_gpu = new SrSimGPU();
-	t = new std::thread([&]{g_gpu->run(); });
-	*/
-
 	cam = new RBCamera();
 	if (!cam) return false;
 	cam->set_position(0, 0, -15);
@@ -90,11 +85,18 @@ bool SoftRApp::_init_softr()
 	obj = RBObject::create_object();
 	if (!obj) return false;
 	//用于做oit的模型
-	obj->load_mesh("objs/1.obj");
+	obj->load_mesh("objs/11.obj");
 	//obj->load_mesh("objs/tri.obj");
 	obj->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
 	obj->_node->set_position(0, -1, 20);
 	obj->_node->rotate(-30, 195, 0);
+
+	obj1 = RBObject::create_object();
+	if (!obj1) return false;
+	obj1->load_mesh("objs/tri.obj");
+	obj1->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj1->_node->set_position(5, -1, 20);
+	obj1->_node->rotate(-30, 195, 0);
 
 	ps = new BaseShaderPS();
 	vs = new BaseShaderVS();
@@ -108,7 +110,7 @@ bool SoftRApp::_init_softr()
 	bf = new SrBufferConstant();
 	bf->init(mb, sizeof(ShaderMatrixBuffer));
 
-	tf = SrTexture2D::creat("Res/kk.jpg");
+	tf = SrTexture2D::creat("Res/2.png");
 
 	/*
 	vs->set_constant_buffer("matrix", bf);
@@ -120,7 +122,7 @@ bool SoftRApp::_init_softr()
 	pip->set_vs(vs);
 	pip->set_out_tex(out_tex);
 
-	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
+	//pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
 
 	RBlog("现在运行的是SoftRApp!!!\n");
 	g_logger->debug_log(WIP_WARNING, "现在运行的是SoftRApp!!!");
@@ -205,7 +207,7 @@ void SoftRApp::handle_input(float dt)
 	}
 	if (Input::get_key_down(WIP_V))
 	{
-		int i = SrSimGPU::thread_num + 1;
+		int i = thread_num + 1;
 		pip->show_buffer_index((_index++)%i);
 		g_logger->debug_print("change to thread %d\n", (_index-1) % i -1);
 	}
@@ -254,17 +256,29 @@ void SoftRApp::UpdateScene(float dt)
 	//cam->pan(tar,10*dt);
 	//cam->rotate(0,0.1,0);
 
+	
 	handle_input(dt);
+
+
+
+	obj1->_node->get_mat(mb->m);
+	cam->get_view_matrix(mb->v);
+	cam->get_perspective_matrix(mb->p);
+	pip->draw(*obj1->get_softr_vertex_buffer(), *obj1->get_softr_index_buffer(), obj1->get_index_count() / 3);
 
 	obj->_node->get_mat(mb->m);
 	cam->get_view_matrix(mb->v);
 	cam->get_perspective_matrix(mb->p);
 	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
+
+	pip->clear();
+	
 }
 
 
 void SoftRApp::DrawScene()
 {
+
 	assert(md3dImmediateContext);
 	assert(mSwapChain);
 
@@ -273,24 +287,10 @@ void SoftRApp::DrawScene()
 	g_env->d3d_context->ClearDepthStencilView(g_env->d3d_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
-	//std::vector<RBColor32> vd;
-
-	/*
-	for (int i = 0; i < 160; ++i)
-		for (int j = 0; j < 160; ++j)
-		{
-			RBColor32 c(255, 0, 0, 255);
-				vd.push_back(c);
-		}
-
-	out_tex->write_data(reinterpret_cast<RBColor32*>(&vd[0]));
-	*/
-
-
 	RBD3D11Renderer::render(cam_d3d,_sprites,ef);
 
 	HR(mSwapChain->Present(0, 0));
-
+	
 }
 
 void SoftRApp::set_depth_state(bool val)

@@ -36,12 +36,19 @@ public:
 		_out_tex = out_tex;
 	}
 	  
+	void clear()
+	{
+		//批量修改内存，下列函数非常耗时
+		//_color_buffer.set_vals(0.f);
+		//_depth_buffer.set_vals(1.1f);
+		_clear_SSBuffer();
+	}
 
 private:
 
 	Profiler _profler;
 
-	void clear();
+	void _clear();
 	void _clear_SSBuffer();
 
 	void _show_buffer(int index,RBD3D11Texture2D* out_tex);

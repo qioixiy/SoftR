@@ -10,12 +10,13 @@
 #include "..\\Logger.h"
 #include "..\\ProducerConsumerQueue.h"
 #include "../RBMath/Inc/Color32.h"
-
+#include <condition_variable>
+#include "../Uitilities.h"
 /*
 保序问题，透明物体渲染http://zhuanlan.zhihu.com/sildenafil/20180902
 http ://graphics.cs.cmu.edu/courses/15869/fall2014/article/1
 */
-
+const int thread_num = 2;
 
 void func();
 class SrSimGPU
@@ -24,7 +25,7 @@ public:
 	struct DataPak
 	{
 		DataPak(size_t queue_size):queue(queue_size),color(nullptr),depth(nullptr),_stage_om(nullptr),_stage_ps(nullptr),
-		ter(false),done(false),total(0){}
+		ter(false),done(false),total(0), total_frag(0),run(false){}
 		folly::ProducerConsumerQueue<VertexP3N3T2> queue;
 		SrSSBuffer<RBColor32>* color;
 		SrSSBuffer<float>* depth;
@@ -33,6 +34,12 @@ public:
 		bool ter;
 		bool done;
 		int total;
+		int total_frag;
+		std::condition_variable cv;
+		std::mutex mt;
+		volatile bool run;
+
+		RBSem sem;
 		void set_container(SrSSBuffer<RBColor32>* color, SrSSBuffer<float>* depth)
 		{
 			this->color = color;
@@ -42,6 +49,17 @@ public:
 		{
 			_stage_om = stage_om;
 			_stage_ps = stage_ps;
+		}
+		void wait()
+		{
+			/*
+			printf("run : %s\n", run ? "true" : "false");
+			int i = 0;
+			while (!run);
+			printf("false %d\n",i);
+			run = false;
+			*/
+			sem.wait();
 		}
 	};
 	SrSimGPU(size_t queue_size)
@@ -77,12 +95,17 @@ public:
 				min_i = i;
 			}
 		}
-		write(min_i,data);
+		int k = dtpks[min_i]->queue.sizeGuess();
+		//大约是queue的长度
+		if (k<10239988)
+			write(min_i,data);
 	}
 
 	inline void write(int index,const VertexP3N3T2& data)
 	{
-		dtpks[index]->queue.write(data);
+		write_num++;
+		
+			dtpks[index]->queue.write(data);
 	}
 
 
@@ -116,15 +139,40 @@ public:
 		return dtpks[index]->queue.sizeGuess();
 	}
 
-	void wait()
+	void print_write_num()
 	{
+		printf("write_num : %d\n",write_num);
+	}
+
+	void clear_write_num()
+	{
+		write_num = 0;
+	}
+
+	int wait()
+	{
+		int res=0;
 		for (int i = 0; i < thread_num; ++i)
 		{
-			while (!dtpks[i]->done);
+			/*
+			if (dtpks[i]->total_frag > 20000)
+			{
+				dtpks[i]->queue.clear();
+				VertexP3N3T2 v;
+				v.finish = true;
+				dtpks[i]->queue.write(v);
+			}
+			*/
+			//printf("wait:%d\n",i);
+			dtpks[i]->sem.wait();
+			//dtpks[i]->wait();
 			//printf("Thread %d finished!\n",i);
-			dtpks[i]->done = false;
+			
+			res += dtpks[i]->total_frag;
+			
+			dtpks[i]->total_frag = 0;
 		}
-		//printf("=========\n");
+		return res;
 	}
 
 	static void run(DataPak* s)
@@ -134,20 +182,40 @@ public:
 		{
 			
 			VertexP3N3T2 v;
+			//if(s->run)
+				//printf("s->run : %s\n", s->run ? "true" : "false");
 			if (s->queue.read(v))
 			{
+				
+				if (v.finish)
+				{
+					//printf("finish\n");
+					if (s->queue.read(v))
+					{
+						printf("break\n");
+						getchar();
+					}
+					s->run = true;
+					//printf("set : %s\n",s->run?"true":"false");
 
-				s->done = false;
-				if (s->queue.sizeGuess() > s->total)
-					s->total = s->queue.sizeGuess();
-				s->_stage_ps->proccess(v);
-				s->_stage_om->proccess(v, *(s->color), *(s->depth));
+					s->sem.signal();
+				}
+				else
+				{
 
-
+					//s->done = false;
+					if (s->queue.sizeGuess() > s->total)
+						s->total = s->queue.sizeGuess();
+					s->_stage_ps->proccess(v);
+					s->_stage_om->proccess(v, *(s->color), *(s->depth));
+					s->total_frag++;
+					
+					
+				}
 			}
 			else
 			{
-				s->done = true;
+				//s->done = true;
 				continue;
 			}
 
@@ -193,13 +261,21 @@ public:
 		}
 	}
 
-	static const int thread_num = 2;
+	int get_total_frag()
+	{
+		int res = 0;
+		for (int i = 0; i < thread_num; ++i)
+			res += dtpks[i]->total_frag;
+		return res;
+	}
+
+	//extern static const int thread_num;
 private:
 	//std::mutex lock_queue;
 	//std::deque<VertexP3N3T2> queue;
-	
-	std::mutex mu;
-	std::condition_variable g_pass_done;
+	int write_num;
+	static std::mutex mu;
+	static std::condition_variable g_pass_done;
 	
 	std::thread t[thread_num];
 	DataPak* dtpks[thread_num];
