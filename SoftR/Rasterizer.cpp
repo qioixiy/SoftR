@@ -1179,7 +1179,7 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 		_total_frag++;
 
 		
-#define OP
+#define OP_
 #ifdef OP
 		if (_last_ts_time < 120)
 		{

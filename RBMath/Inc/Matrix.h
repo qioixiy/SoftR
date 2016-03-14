@@ -71,7 +71,14 @@ public:
 
 	FORCEINLINE RBVector3 inv_transform_position(const RBVector3 &V) const;
 
-	FORCEINLINE RBVector4 transform_vector3(const RBVector3& V) const;
+	FORCEINLINE RBVector4 transform_vector3(const RBVector3& V) const
+	{
+		RBVector4 o(0, 0, 0, 1);
+		RBVector4 p(V, 1);
+		o = o* *this;
+		p = p* *this;
+		return (p - o);
+	}
 
 	FORCEINLINE RBVector3 inv_transform_vector3(const RBVector3 &V) const;
 

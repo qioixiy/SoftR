@@ -113,8 +113,8 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 	//多线程
 	//_rasterizer = new SrRasterizer();
 	_rasterizer = new SrRasterizer(&s1);
-	int w = 1920;
-	int h = 1080;
+	int w = RW;
+	int h = RH;
 	_rasterizer->set_viewport_shape(w, h);
 
 	_depth_buffer.init(w,h);
@@ -172,7 +172,7 @@ SrPipeline::~SrPipeline()
 
 void SrPipeline::_clear()
 {	
-	//这行防止无休止释放内存，暂时代码，以后使用垃圾回收器集中处理	
+	//SrTriangle::print_mem();
 #ifdef POOL
 	for (auto& tri : _triangles)
 	{

@@ -1,6 +1,7 @@
 #include "D3D11Texture2D.h"
 #include "2DRendering.h"
 
+
 RBD3D11Texture2D* RBD3D11Texture2D::create(float w, float h, Texture2DTypes type, const char* filename)
 {
 	RBD3D11Texture2D* ret = new RBD3D11Texture2D();
@@ -9,13 +10,13 @@ RBD3D11Texture2D* RBD3D11Texture2D::create(float w, float h, Texture2DTypes type
 	{
 	case RBD3D11Texture2D::E_RENDERTARGET:
 		//ÎÆÀí³ß´ç£¡×¢Òâ
-		ret->init_render_texture(1280, 720);
+		ret->init_render_texture(RW, RH);
 		break;
 	case RBD3D11Texture2D::E_TEXTURE:
 		ret->init_texture(filename);
 		break;
 	case RBD3D11Texture2D::E_DYNAMIC:
-		ret->init_dynamic(1920,1080);
+		ret->init_dynamic(RW,RH);
 		break;
 	case RBD3D11Texture2D::E_UNKOWN:
 	case RBD3D11Texture2D::E_TATOL:

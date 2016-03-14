@@ -59,8 +59,8 @@ void RBPoolAllctor::free(void** header,void *p)
 //4/single_size/4
 void RBPoolAllctor::expand_free_list(int single_size,void** header,int n /* = g_pool_expand_node_number = 32 */)
 {
+	
 	CHECK(*header == NULL );
-
 	/*     p    
 	//XXX4/XXXXXXXXXXXXXXXX.../XXXX
 	*/
@@ -82,7 +82,9 @@ void *RBPoolAllctor::allocate_aligned(uint tsize)
 	CHECK(RBMath::is_pow_2(_alignment));
 
 	size_t size = tsize + _alignment;
-	uint origin_address = (uint)malloc(size);
+	uint origin_address = (uint)::malloc(size);
+	if (!origin_address)
+		return nullptr;
 	uint tmask = (_alignment - 1);
 	uint misaligment = (origin_address & tmask);
 	uint adjust = _alignment - misaligment;

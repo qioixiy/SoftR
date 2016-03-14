@@ -216,7 +216,6 @@ struct VertexFormats
 					i += 3;
 
 				}
-				printf("total %d\n", n);
 				fflush(stdout);
 			}
 			

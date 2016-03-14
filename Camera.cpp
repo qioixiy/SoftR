@@ -100,6 +100,7 @@ void RBCamera::get_ortho(RBMatrix& out_mat) const
 
 void RBCamera::pan(const RBVector3& target, float degree)
 {
+	/*
 	RBVector4 _t(_position,1.f);
 	RBVector4 _t2(target,1.f);
 	RBMatrix m1,m2,m3;
@@ -117,5 +118,15 @@ void RBCamera::pan(const RBVector3& target, float degree)
 	_position.x = _t.x;
 	_position.y = _t.y;
 	_position.z = _t.z;
+	*/
+
+	RBMatrix m;
+	m.rotate(0, degree, 0);
+	RBVector4 s = target - _position;
+	s = m.transform_vector3(-s);
+	_position = s;
+	_forward = -s;
+	_forward.w = 1;
+	
 }
 

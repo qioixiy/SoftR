@@ -5,7 +5,7 @@
 #include "../Mem/MemoryFrame.h"
 #include <vector>
 #include <mutex>
-//#define POOL
+#define POOL
 struct SrTriangle
 {
 	VertexP3N3T2 v[3];
@@ -65,8 +65,17 @@ struct SrTriangle
 		frame->shutdown();
 		frame = nullptr;
 	}
+#else
+	static void print_mem()
+	{
+		pool->print_list<SrTriangle>(nodes);
+	}
 #endif
-
+	
+	void print()
+	{
+		printf("%d:%f\n",this,v[1].normal.x);
+	}
 #ifdef POOL
 	static void* nodes;
 	static RBPoolAllctor* pool;

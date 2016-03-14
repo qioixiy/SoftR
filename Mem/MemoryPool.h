@@ -13,7 +13,7 @@ struct MemoryPoolNode
 */
 
 //TODO:内存存放位置的调整使得程序不那么别扭
-                    
+
 #define NEXT_NODE(p) *(void**)((uint)p+single_size)
 
 #define NEW_NODE(single_size) (void*)(((uint)allocate_aligned(sizeof(void*)+single_size))+4)
@@ -52,7 +52,7 @@ public:
 	template<class T>
 	void print_list(void *header)
 	{
-		size_t single_size = sizeof(ATEST);
+		size_t single_size = sizeof(T);
 		void* p = header;
 		while (NULL!=p)
 		{

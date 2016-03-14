@@ -98,6 +98,19 @@ bool SoftRApp::_init_softr()
 	obj1->_node->set_position(5, -1, 20);
 	obj1->_node->rotate(-30, 195, 0);
 
+	obj2 = RBObject::create_object();
+	if (!obj2) return false;
+	obj2->load_mesh("objs/kl.obj");
+	obj2->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj2->_node->set_position(-10, -1, 20);
+	obj2->_node->rotate(-10, 230, 0);
+
+
+	g_logger->debug_print("Total surface: %d", obj2->get_index_count() / 3);
+	g_logger->debug_print("Total surface: %d", obj->get_index_count() / 3);
+	g_logger->debug_print("Total surface: %d", obj1->get_index_count() / 3);
+
+
 	ps = new BaseShaderPS();
 	vs = new BaseShaderVS();
 
@@ -250,16 +263,15 @@ void SoftRApp::UpdateScene(float dt)
 {
 
 	//obj->_node->translate(0,dt,0);
-	//obj1->_node->rotate(0,10*dt,0);
+	obj2->_node->rotate(0,10*dt,0);
+	obj->_node->rotate(10*dt, 10 * dt, 0);
+	obj1->_node->rotate(0, 10 * dt, 5*dt);
 	//obj->_node->rotate(0,10*dt,0);
 	//RBVector3 tar = RBVector3(0, 0, 0);
-	//cam->pan(tar,10*dt);
+	//cam->pan(tar,100*dt);
 	//cam->rotate(0,0.1,0);
 
-	
 	handle_input(dt);
-
-
 
 	obj1->_node->get_mat(mb->m);
 	cam->get_view_matrix(mb->v);
@@ -270,6 +282,11 @@ void SoftRApp::UpdateScene(float dt)
 	cam->get_view_matrix(mb->v);
 	cam->get_perspective_matrix(mb->p);
 	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
+
+	obj2->_node->get_mat(mb->m);
+	cam->get_view_matrix(mb->v);
+	cam->get_perspective_matrix(mb->p);
+	pip->draw(*obj2->get_softr_vertex_buffer(), *obj2->get_softr_index_buffer(), obj2->get_index_count() / 3);
 
 	pip->clear();
 	
@@ -295,7 +312,6 @@ void SoftRApp::DrawScene()
 
 void SoftRApp::set_depth_state(bool val)
 {
-
 	if (val)
 	{
 		g_env->d3d_context->OMSetDepthStencilState(m_depthStencilState, 1);
@@ -304,8 +320,6 @@ void SoftRApp::set_depth_state(bool val)
 	{
 		g_env->d3d_context->OMSetDepthStencilState(m_depthDisabledStencilState, 1);
 	}
-
-
 }
 
 void SoftRApp::set_viewport(float ltx, float lty, float w, float h, float min_depth, float max_depth)
