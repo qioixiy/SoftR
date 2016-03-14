@@ -14,6 +14,9 @@ public:
 		//¸ßÏûºÄ
 		tex = get_texture2d_index(0);
 		tc = sp.sample(tex, vert_lerp.text_coord.x, vert_lerp.text_coord.y);
+		tc.r = RBMath::pow(tc.r, 2.2);
+		tc.g = RBMath::pow(tc.g, 2.2);
+		tc.b = RBMath::pow(tc.b, 2.2);
 		//tc = RBColorf::white;
 		
 		vert_lerp.normal.normalize();

@@ -85,24 +85,24 @@ bool SoftRApp::_init_softr()
 	obj = RBObject::create_object();
 	if (!obj) return false;
 	//用于做oit的模型
-	obj->load_mesh("objs/11.obj");
+	obj->load_mesh("Res/cube.obj");
 	//obj->load_mesh("objs/tri.obj");
 	obj->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
-	obj->_node->set_position(0, -1, 20);
+	obj->_node->set_position(0, -1, 120);
 	obj->_node->rotate(-30, 195, 0);
 
 	obj1 = RBObject::create_object();
 	if (!obj1) return false;
-	obj1->load_mesh("objs/tri.obj");
+	obj1->load_mesh("Res/0001.obj");
 	obj1->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
-	obj1->_node->set_position(5, -1, 20);
+	obj1->_node->set_position(5, -1, 200);
 	obj1->_node->rotate(-30, 195, 0);
 
 	obj2 = RBObject::create_object();
 	if (!obj2) return false;
-	obj2->load_mesh("objs/kl.obj");
+	obj2->load_mesh("Res/man.obj");
 	obj2->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
-	obj2->_node->set_position(-10, -1, 20);
+	obj2->_node->set_position(-10, -1, 120);
 	obj2->_node->rotate(-10, 230, 0);
 
 
@@ -123,7 +123,7 @@ bool SoftRApp::_init_softr()
 	bf = new SrBufferConstant();
 	bf->init(mb, sizeof(ShaderMatrixBuffer));
 
-	tf = SrTexture2D::creat("Res/2.png");
+	tf = SrTexture2D::creat("Res/man.png");
 
 	/*
 	vs->set_constant_buffer("matrix", bf);

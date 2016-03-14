@@ -5,7 +5,7 @@
 #include "../Mem/MemoryFrame.h"
 #include <vector>
 #include <mutex>
-#define POOL
+//#define POOL
 struct SrTriangle
 {
 	VertexP3N3T2 v[3];
