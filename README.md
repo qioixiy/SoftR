@@ -132,6 +132,7 @@ Note
 
 Rencently TODO
 =========
+- 完善管线，按照标准的现代管线完善，clipping space，clipping等等
 - 添加一个帧率太低就直接discard，并且记录下来的功能
 - 各个部件的Release测试
 - 线程安全处理
