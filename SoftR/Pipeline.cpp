@@ -1,28 +1,48 @@
 #include "Pipeline.h"
 #include "SimGPU.h"
 
+#include "../Debug.h"
 
 
 void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex & index_buffer, int num_tri)
 {
-
+	rmt_BeginCPUSample(PipLine);
 	//_backup_index = &index_buffer;
 	//_backup_vertex = &vertex_buffer;
+	
 
 	_profler.set_begin();
+	rmt_BeginCPUSample(IA);
 	_stage_ia->proccess(vertex_buffer, index_buffer, _triangles, num_tri);
+	rmt_EndCPUSample();//IA
+
 	_profler.set_end("IA"); _profler.set_begin();
+	rmt_BeginCPUSample(VS);
 	_stage_vs->proccess(_triangles,num_tri);
+	rmt_EndCPUSample();//VS
+	
 	_profler.set_end("VS"); _profler.set_begin();
+	rmt_BeginCPUSample(GS);
 	_stage_gs->proccess();
+	rmt_EndCPUSample();//GS
+
 	_profler.set_end("GS"); _profler.set_begin();
+	rmt_BeginCPUSample(NEAR_FAR_CULL);
 	_rasterizer->near_far_cull(_triangles, _triangles_near_far_cull,num_tri);
+	rmt_EndCPUSample();//NEAR_FAR_CULL
 	_profler.set_end("NFC"); _profler.set_begin();
+	rmt_BeginCPUSample(BACK_CULL);
 	_rasterizer->back_cull(_triangles_near_far_cull, _triangles_back_cull);
+	rmt_EndCPUSample();//BACK_CULL
 	_profler.set_end("BC"); _profler.set_begin();
+	rmt_BeginCPUSample(CLIP);
 	_rasterizer->clip(_triangles_back_cull, _triangles_clip);
+	rmt_EndCPUSample();//CLIP
+
 	_profler.set_end("CLIP"); _profler.set_begin();
+	rmt_BeginCPUSample(TS);
 	_rasterizer->triangle_setup(_triangles_clip, _triangles_fragments);
+	rmt_EndCPUSample();//TS
 	_profler.set_end("TS"); 
 	
 
@@ -31,9 +51,12 @@ void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex 
 	
 
 	_profler.set_begin();
+	rmt_BeginCPUSample(thread_wait);
 	int f1 = s1.wait();
+	rmt_EndCPUSample();//thread wait
 	_profler.set_end("WAIT");
 
+	rmt_EndCPUSample();//Pipline
 	//其他的靠谱merge方法！
 	//_profler.set_begin();
 	//s1.merge_result_color(_color_buffer);
@@ -155,6 +178,7 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 
 SrPipeline::~SrPipeline()
 {
+	
 	for (int i = 0; i < thread_num; ++i)
 	{
 		delete _depth_buffers[i];

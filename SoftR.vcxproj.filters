@@ -78,6 +78,9 @@
     <Filter Include="MemTOUSE">
       <UniqueIdentifier>{9736624c-10e4-4fc1-80f0-3edc8ce1098c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Uti\Debug">
+      <UniqueIdentifier>{a94cf20d-73e7-41fe-b316-a588ca4541b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -269,6 +272,12 @@
     </ClCompile>
     <ClCompile Include="SoftR\InnerData.cpp">
       <Filter>SoftRWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="Remotery.c">
+      <Filter>Uti\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Uti\Debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -547,6 +556,12 @@
     </ClInclude>
     <ClInclude Include="SoftR\InnerData.h">
       <Filter>SoftRWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="Remotery.h">
+      <Filter>Uti\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Uti\Debug</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

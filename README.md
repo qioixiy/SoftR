@@ -132,7 +132,7 @@ Note
 
 Rencently TODO
 =========
-- 完善管线，按照标准的现代管线完善，clipping space，clipping等等
+- **完善管线，按照标准的现代管线完善，clipping space，clipping等等**
 - 添加一个帧率太低就直接discard，并且记录下来的功能
 - 各个部件的Release测试
 - 线程安全处理
@@ -164,6 +164,12 @@ Rencetly Update
 
 **2016/2/14**
 -	使用while语句同步，这句同步在Release会被优化，所以Release优化已关闭
+
+**2016/3/1**
+-	更新了多线程，使用信号量进行同步。
+
+**2016/3/15**
+-	添加了Remotery来Profile。运来的Profile依然在工作。
 
 Platform Dependences
 ========

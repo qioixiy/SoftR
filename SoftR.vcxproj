@@ -108,6 +108,7 @@
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="D3D11Texture.cpp" />
     <ClCompile Include="D3D11Texture2D.cpp" />
+    <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GlobalEnv.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -129,6 +130,7 @@
     <ClCompile Include="RBMath\Src\RBMath.cpp" />
     <ClCompile Include="RBMath\Src\RBMathImpl.cpp" />
     <ClCompile Include="RBTimer.cpp" />
+    <ClCompile Include="Remotery.c" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SoftRApp.cpp" />
@@ -177,6 +179,7 @@
     <ClInclude Include="D3D11Texture.h" />
     <ClInclude Include="D3D11Texture2D.h" />
     <ClInclude Include="d3dUtil.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="GlobalEnv.h" />
@@ -218,6 +221,7 @@
     <ClInclude Include="RBMath\Inc\Vector3.h" />
     <ClInclude Include="RBMath\Inc\Vector4.h" />
     <ClInclude Include="RBTimer.h" />
+    <ClInclude Include="Remotery.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SoftRApp.h" />

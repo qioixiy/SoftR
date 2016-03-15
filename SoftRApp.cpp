@@ -16,10 +16,12 @@
 #include "VertexFormats.h"
 #include "SoftR\\Texture2D.h"
 #include "SoftR\\SimGPU.h"
+#include "Debug.h"
 
 SoftRApp::SoftRApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 {
+	RemoteryDebug::get_remotery();
 	_index = 0;
 }
 #include "Logger.h"
@@ -176,6 +178,8 @@ void SoftRApp::Termination()
 	delete t;
 	*/
 	
+
+
 	delete ps;
 	delete vs;
 	delete mb;
@@ -186,6 +190,8 @@ void SoftRApp::Termination()
 	//RBclose_log();
 	g_input_manager->shutdown();
 	g_res_manager->shutdown();
+
+	RemoteryDebug::ReleaseRemotery();
 
 }
 
