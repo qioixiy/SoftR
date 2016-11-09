@@ -169,7 +169,10 @@ Rencetly Update
 -	更新了多线程，使用信号量进行同步。
 
 **2016/3/15**
--	添加了Remotery来Profile。运来的Profile依然在工作。
+-	添加了Remotery来Profile。原来的Profile依然在工作。
+
+**2016/11/10**
+-	注释了Profile输出，改回了Release模式编译，将原本的双线程变成了四线程。
 
 Platform Dependences
 ========

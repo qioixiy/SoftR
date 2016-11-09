@@ -71,7 +71,7 @@ void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex 
 	//_rasterizer->shade(_triangles_fragments);
 	//_triangles_fragments:px.position.w = c.a;px.normal.x = c.r;px.normal.y = c.g;px.normal.z = c.b;
 	//_rasterizer->merge(_triangles_fragments,_color_buffer,_depth_buffer);
-	_profler.out_put_after_time(20);
+	//_profler.out_put_after_time(20);
 	_rasterizer->set_last_ts_time(_profler.get_time());
 
 	_show_buffer(_bfidx,_out_tex);
@@ -112,7 +112,7 @@ void SrPipeline::_clear_SSBuffer()
 	}
 }
 
-#define MAX_QUEUE_SIZE 10240000
+#define MAX_QUEUE_SIZE 10240000/4
 SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 {
 	_bfidx = 0;

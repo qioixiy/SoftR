@@ -16,7 +16,7 @@
 保序问题，透明物体渲染http://zhuanlan.zhihu.com/sildenafil/20180902
 http ://graphics.cs.cmu.edu/courses/15869/fall2014/article/1
 */
-const int thread_num = 2;
+const int thread_num = 4;
 
 void func();
 class SrSimGPU
