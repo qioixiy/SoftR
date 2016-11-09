@@ -132,22 +132,19 @@ Note
 
 Rencently TODO
 =========
-- **完善管线，按照标准的现代管线完善，clipping space，clipping等等**
-- 添加一个帧率太低就直接discard，并且记录下来的功能
-- 各个部件的Release测试
-- 线程安全处理
-- 新的并行模式
-- SIMD优化
-- Blending:这个在并行优化之后再做，有一种方案的优化并不允许做blending而只允许test。
-- 渲染至纹理
-- 双缓存
-- 并行优化
-- 完美裁剪
-- MSAA
-- 混合
-- mipmap
-- 多种纹理采样方案
-- OIT
+
+-   **完善基本的管线，按照标准的现代管线完善，clipping space，clipping等等**
+-   完善帧率太低就直接discard，并且记录下来的功能（这个功能当前是在fragment里面做的，效果还不是很好）
+-   各个部件的线程安全测试和修复
+-   SIMD加速
+-   CommandQueue
+-   新的或者完整的并行模式
+-   Blending
+-   更完整的渲染功能（如支持**渲染至纹理**，**多缓冲**，**mipmap**，**
+MSAA**等）
+-   更多的纹理采样方案
+-   OIT
+-   新的光栅化/并行架构
 
 Rencetly Update
 =========
@@ -173,6 +170,7 @@ Rencetly Update
 
 **2016/11/10**
 -	注释了Profile输出，改回了Release模式编译，将原本的双线程变成了四线程。
+
 
 Platform Dependences
 ========
