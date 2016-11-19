@@ -150,27 +150,27 @@ MSAA**等）
 Rencetly Update
 =========
 **2016/2/12**
--	~~添加内存池（非线程安全），用在了SrTriangle上，重载了new和delete~~
--	~~logger添加了一个简单的print函数，logger没有线程安全~~
--	~~工程调整为main启动的程序，RBLog被重定向到logger~~
--	~~工程移到VS2015支持c++11，去掉了dxerr的支持，现在所有的dx调试信息都移除了，包括HR宏和Shader中的DXTRACE_ERR_MSGBOX都已经失效~~
--	~~更新了profiler，现在可以更在自由的使用字符串标识测试结果~~
+-	添加内存池（非线程安全），用在了SrTriangle上，重载了new和delete
+-	logger添加了一个简单的print函数，logger没有线程安全
+-	工程调整为main启动的程序，RBLog被重定向到logger
+-	工程移到VS2015支持c++11，去掉了dxerr的支持，现在所有的dx调试信息都移除了，包括HR宏和Shader中的DXTRACE_ERR_MSGBOX都已经失效
+-	更新了profiler，现在可以更在自由的使用字符串标识测试结果
 
 **2016/2/13**
--	~~添加多线程支持，在scanline阶段之后程序并行，暂时考虑为片元处理为并行，这种方法还要解决多线程结果merge的问题，如果逐像素merge消耗太高，不实际，不如直接对原buffer进行加锁读取，还有一种考虑是实现一个无锁的SSBuffer。还有一种方案是图元并行，这种方法应该更加高效简单~~
--	~~Release模式无法运行无法测试，需要修改，其中FreeImage运行出错，怀疑是编译器版本不对~~
+-	添加多线程支持，在scanline阶段之后程序并行，暂时考虑为片元处理为并行，这种方法还要解决多线程结果merge的问题，如果逐像素merge消耗太高，不实际，不如直接对原buffer进行加锁读取，还有一种考虑是实现一个无锁的SSBuffer。还有一种方案是图元并行，这种方法应该更加高效简单
+-	Release模式无法运行无法测试，需要修改，其中FreeImage运行出错，怀疑是编译器版本不对
 
 **2016/2/14**
--	~~使用while语句同步，这句同步在Release会被优化，所以Release优化已关闭~~
+-	使用while语句同步，这句同步在Release会被优化，所以Release优化已关闭
 
 **2016/3/1**
--	~~更新了多线程，使用信号量进行同步。~~
+-	更新了多线程，使用信号量进行同步。
 
 **2016/3/15**
--	~~添加了Remotery来Profile。原来的Profile依然在工作。~~
+-	添加了Remotery来Profile。原来的Profile依然在工作。
 
 **2016/11/10**
--	~~注释了Profile输出，改回了Release模式编译，将原本的双线程变成了四线程。~~
+-	注释了Profile输出，改回了Release模式编译，将原本的双线程变成了四线程。
 
 
 Platform Dependences
