@@ -4,10 +4,10 @@
 #include "RBBasedata.h"
 
 
-//ÄÚ´æ¶ÔÆë£ºbyte¶ÔÆë
-#define BYTEALIGN (int)8
-//Ç¿ÖÆ¶ÔÆë
-#define ALIGNUP(naddress,nbytes) ((((uint)naddress)+\
+//å†…å­˜å¯¹é½ï¼šbyteå¯¹é½
+#define BYTEALIGN (size_t)8
+//å¼ºåˆ¶å¯¹é½
+#define ALIGNUP(naddress,nbytes) ((((size_t)naddress)+\
 	(nbytes)-1 ) & (~((nbytes)-1)))
 
 typedef bool MPOS;
@@ -16,7 +16,7 @@ class IRBBaseAlloctor abstract
 {
 public:
 	virtual INI_RESULT init(size_t tsize) = 0;
-	//·µ»Ø¿ÕÔò·µ»ØÊ§°Ü£¬ĞÅÏ¢±»Ğ´µ½ÈÕÖ¾ÀïÃæ
+	//è¿”å›ç©ºåˆ™è¿”å›å¤±è´¥ï¼Œä¿¡æ¯è¢«å†™åˆ°æ—¥å¿—é‡Œé¢
 	virtual void* alloc(size_t tsize) = 0;
 	//virtual void* alloc(size_t tsize,MPOS tpos) = 0;
 	virtual INI_RESULT shutdown() = 0;
@@ -31,7 +31,7 @@ class  IRBSystemAlloctor abstract
 public:
 
 	void *operator new(size_t);
-	void operator delete(void*){printf("ÏÖÔÚÔÚÉ¾³ı£¬µ«ÊÇÒÀÈ»Ã»ÓĞ·ÖÅäÄÚ´æ£¡");}
+	void operator delete(void*){printf("ç°åœ¨åœ¨åˆ é™¤ï¼Œä½†æ˜¯ä¾ç„¶æ²¡æœ‰åˆ†é…å†…å­˜ï¼");}
 
 	void *operator new[](size_t){void* p;return p;}
 	void operator delete[](void*){}
