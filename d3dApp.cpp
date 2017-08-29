@@ -94,28 +94,8 @@ int D3DApp::Run()
 	MSG msg = {0};
  
 	mTimer.Reset();
-
 	while(msg.message != WM_QUIT)
 	{
-		/*
-
-		{
-			int bits = g_input_manager->get_last_key_info()->key_bit;
-			int bits_c = g_input_manager->get_last_key_info()[1].key_bit;
-
-			if (lmouse_keep_going)
-			{
-				bits |= WIP_MOUSE_LBUTTON;
-				//int t;
-			}
-			if (rmouse_keep_going)
-				bits |= WIP_MOUSE_RBUTTON;
-			if (mmouse_keep_going)
-				bits |= WIP_MOUSE_MBUTTON;
-			g_input_manager->update(bits_c, bits);
-
-		}
-		*/
 		// If there are Window messages then process them.
 		if(PeekMessage( &msg, 0, 0, 0, PM_REMOVE ))
 		{
@@ -126,7 +106,6 @@ int D3DApp::Run()
 		else
         {	
 
-
 			mTimer.Tick();
 
 			if( !mAppPaused )
@@ -134,10 +113,6 @@ int D3DApp::Run()
 				CalculateFrameStats();
 				UpdateScene(mTimer.DeltaTime());	
 				DrawScene();
-
-				//g_input_manager->clear_states();
-				//g_input_manager->clear_scroller();
-
 				int bits = g_input_manager->get_last_key_info()->key_bit;
 				int bits_c = g_input_manager->get_last_key_info()[1].key_bit;
 				g_input_manager->update(bits_c, bits);

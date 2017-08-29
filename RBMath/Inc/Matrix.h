@@ -16,7 +16,7 @@ public:
 	//UE4 use a union to surround the data
 	//not sure the reason
 #if _MSC_VER > 1700
-	ALIGN(16) f32 m[4][4];
+	f32 m[4][4];
 #else
 	f32 m[4][4];
 #endif

@@ -74,11 +74,25 @@ protected:
 	RBObject* obj;
 	RBObject* obj1;
 	RBObject* obj2;
+	RBObject* obj_man;
+	RBObject* obj_floor_down;
+	RBObject* obj_wolf;
+	RBObject* obj_sky;
+
+
 	SrPipeline* pip;
 	BaseShaderPS* ps;
 	BaseShaderVS* vs;
 	SrBufferConstant* bf;
 	SrTexture2D* tf;
+	SrTexture2D* tf1;
+	SrTexture2D* tf2;
+	SrTexture2D* tf_man;
+	SrTexture2D* tf_wolf;
+	SrTexture2D* tf_floor_down;
+	SrTexture2D* tf_sky;
+
+
 	ShaderMatrixBuffer* mb;
 
 private:
@@ -86,4 +100,8 @@ private:
 	bool _init_softr();
 
 	int _index;
+
+	float cam_np;
+
+	SrSSBuffer<RBColor32>* back_color_buffer;
 };

@@ -1,9 +1,9 @@
-#include "Rasterizer.h"
+Ôªø#include "Rasterizer.h"
 #include "../RBMath/Inc/RBMathBase.h"
 #include <math.h>
 #include "..\\Uitilities.h"
 #include "SimGPU.h"
-
+#include "../Input.h"
 
 SrRasterizer::SrRasterizer()
 {
@@ -13,6 +13,8 @@ SrRasterizer::SrRasterizer()
 	_stage_ps = new SrStagePS();
 	_stage_om = new SrStageOM();
 	_total_frag = 0;
+
+	sss = false;
 }
 
 SrRasterizer::SrRasterizer(SrSimGPU * gpu)
@@ -26,8 +28,11 @@ SrRasterizer::SrRasterizer(SrSimGPU * gpu)
 	for (int i = 0; i < thread_num; ++i)
 	{
 		gpu->set_stage(i, _stage_ps, _stage_om);
+#ifdef TRI
+		gpu->set_raster(i,this);
+#endif
 	}
-
+	
 	_gpu = gpu;
 	_total_frag = 0;
 }
@@ -44,28 +49,58 @@ void SrRasterizer::set_viewport_shape(float w, float h)
 	_viewport_h = h;
 }
 
-void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_near_far_cull,int n)
+void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_near_far_cull, int n)
 {
-	//xyz≥˝“‘w£¨µ´ «±£¡ÙwŒ™z
-			for(auto tri : _triangles)
-			{
+	//clip space
+	/*
+	we use
+	-w<=x<=w
+	-w<=y<=w
+	0<=z<=w
+	0<=w
+	to clip triangles
+	so we need not care dividing zero.
+	*/
+	/*
+	for (auto tri : _triangles)
+	{
+	if (tri->v[0].position.w <0||
+	tri->v[1].position.w <0||
+	tri->v[2].position.w <0)
+	{
+	continue;
+	}
 
-		float inv_w = 1.f / tri->v[0].position.w;
+	//ËøôÈáå‰æùÁÑ∂Âè™ÂÅöËøëËøúÈù¢Ë£ÅÂâ™ÔºåÂÖ∂‰ªñÂõõÂë®ÁöÑË£ÅÂâ™Âú®ÂÖâÊ†ÖÂåñÁöÑÊó∂ÂÄô‰ª•fragment‰∏∫Âçï‰ΩçÂÅö
+	//Ê≥®ÊÑèËøëÈù¢Ë£ÅÂâ™ÊòØ‰∏ÄÂÆöË¶ÅÂÅöÁöÑÔºåÂõ†‰∏∫‰∏çÂÅöËøëÈù¢‰ºöÂá∫Áé∞ÈîôËØØÔºåÂÖ∂‰ªñÁöÑÂÅö‰∏çÂÅöÂíåÊïàÁéáÊúâÂÖ≥Ôºå‰ΩÜÊòØÊúÄÂ•ΩÊòØÂú®triangleÈò∂ÊÆµÂÅö
+
+
+	}
+	*/
+
+
+	//xyzÈô§‰ª•wÔºå‰ΩÜÊòØ‰øùÁïôw‰∏∫z
+	for (auto tri : _triangles)
+	{
+		
+		//note:divide w need abs in case -*-=+
+		float inv_w = RBMath::abs(1.f / tri->v[0].position.w);
 		float x1 = tri->v[0].position.x * inv_w;
 		float y1 = tri->v[0].position.y * inv_w;
 		float z1 = tri->v[0].position.z * inv_w;
 
-		inv_w = 1.f / tri->v[1].position.w;
+		inv_w = RBMath::abs(1.f / tri->v[1].position.w);
 		float x2 = tri->v[1].position.x * inv_w;
 		float y2 = tri->v[1].position.y * inv_w;
 		float z2 = tri->v[1].position.z * inv_w;
 
-		inv_w = 1.f / tri->v[2].position.w;
+		inv_w = RBMath::abs(1.f / tri->v[2].position.w);
 		float x3 = tri->v[2].position.x * inv_w;
 		float y3 = tri->v[2].position.y * inv_w;
 		float z3 = tri->v[2].position.z * inv_w;
 
 		float far_z = 1;
+
 		tri->v[0].position.x = x1;
 		tri->v[0].position.y = y1;
 		tri->v[0].position.z = z1;
@@ -77,28 +112,49 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 		tri->v[2].position.x = x3;
 		tri->v[2].position.y = y3;
 		tri->v[2].position.z = z3;
+
+		if ((z1>far_z&&z2>far_z&&z3>far_z) || (z1<0 && z2<0 && z3<0))
+		{
+			continue;
+		}
 		
 
-		if((z1>far_z&&z2>far_z&&z3>far_z)||(z1<0&&z2<0&&z3<0))
+		
+
+		if ((x1 <= -1 && x2 <= -1 && x3 <= -1)|| (x1 >=1 && x2 >=1 && x3 >=1))
 		{
 			continue;
 		}
 
-		if ( z1 >= 0 && z2 >= 0 && z3 >= 0)
+		if ((y1 <= -1 && y2 <= -1 && y3 <= -1) || (y1 >= 1 && y2 >= 1 && y3 >= 1))
+		{
+			continue;
+		}
+
+		if ((x1 > -1 && x2 > -1 && x3 > -1) && (x1 < 1 && x2 < 1 && x3 < 1) && (y1 > -1 && y2 > -1 && y3 > -1) && (y1 < 1 && y2 < 1 && y3 < 1))
+		{
+			if (z1 >= 0 && z2 >= 0 && z3 >= 0)
+			{
+				_triangles_near_far_cull.push_back(tri);
+				continue;
+			}
+		}
+
+		if (z1 >= 0 && z2 >= 0 && z3 >= 0)
 		{
 			_triangles_near_far_cull.push_back(tri);
 			continue;
 		}
+		//Â§ÑÁêÜÊâÄÊúâËøëË£ÅÂâ™Èù¢Áõ∏‰∫§ÁöÑ‰∏âËßíÂΩ¢,‰øùÁªïÂ∫è
 
-		//¥¶¿ÌÀ˘”–Ω¸≤√ºÙ√Êœ‡Ωªµƒ»˝Ω«–Œ,±£»∆–Ú
-		
 		if (z1 < 0 && z2>0 && z3 > 0)
 		{
+
 			float t = -z1 / (z2 - z1);
 			VertexP3N3T2 newv1;
-			newv1.position = _lerp_position(tri->v[0].position,tri->v[1].position,t);
-			newv1.normal = _lerp_normal(tri->v[0].normal,tri->v[1].normal,t);
-			newv1.text_coord = _lerp_uv(tri->v[0].text_coord,tri->v[0].position.w,tri->v[1].text_coord,tri->v[1].position.w,t);
+			newv1.position = _lerp_position(tri->v[0].position, tri->v[1].position, t);
+			newv1.normal = _lerp_normal(tri->v[0].normal, tri->v[1].normal, t);
+			newv1.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[1].text_coord, tri->v[1].position.w, t);
 
 
 			t = -z1 / (z3 - z1);
@@ -106,14 +162,16 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 			newv2.position = _lerp_position(tri->v[0].position, tri->v[2].position, t);
 			newv2.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, t);
 			newv2.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, t);
-			SrTriangle* addtri = new SrTriangle(newv1,tri->v[2],newv2);
+			SrTriangle* addtri = new SrTriangle(newv1, tri->v[2], newv2);
 			_triangles_near_far_cull.push_back(addtri);
 
 			tri->v[0] = newv1;
+
 			_triangles_near_far_cull.push_back(tri);
 		}
 		if (z1 > 0 && z2 < 0 && z3>0)
 		{
+
 			float t = -z2 / (z3 - z2);
 			VertexP3N3T2 newv1;
 			newv1.position = _lerp_position(tri->v[1].position, tri->v[2].position, t);
@@ -129,20 +187,22 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 			newv2.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[0].text_coord, tri->v[0].position.w, t);
 			SrTriangle* addtri = new SrTriangle(newv1, tri->v[0], newv2);
 			_triangles_near_far_cull.push_back(addtri);
-			
+
 
 			tri->v[1] = newv1;
+
 			_triangles_near_far_cull.push_back(tri);
-			
+
 		}
 		if (z1 > 0 && z2 > 0 && z3 < 0)
 		{
+
 			float t = -z3 / (z1 - z3);
 			VertexP3N3T2 newv1;
 			newv1.position = _lerp_position(tri->v[2].position, tri->v[0].position, t);
 			newv1.normal = _lerp_normal(tri->v[2].normal, tri->v[0].normal, t);
 			newv1.text_coord = _lerp_uv(tri->v[2].text_coord, tri->v[2].position.w, tri->v[0].text_coord, tri->v[0].position.w, t);
-		
+
 			t = -z3 / (z2 - z3);
 			VertexP3N3T2 newv2;
 			newv2.position = _lerp_position(tri->v[2].position, tri->v[1].position, t);
@@ -152,18 +212,20 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 			_triangles_near_far_cull.push_back(addtri);
 
 			tri->v[2] = newv1;
+
 			_triangles_near_far_cull.push_back(tri);
 		}
 
 
 		if (z1>0 && z2 < 0 && z3 < 0)
 		{
+
 			float t = -z3 / (z1 - z3);
 			VertexP3N3T2 newv1;
 			newv1.position = _lerp_position(tri->v[2].position, tri->v[0].position, t);
 			newv1.normal = _lerp_normal(tri->v[2].normal, tri->v[0].normal, t);
 			newv1.text_coord = _lerp_uv(tri->v[2].text_coord, tri->v[2].position.w, tri->v[0].text_coord, tri->v[0].position.w, t);
-			
+
 			t = -z2 / (z1 - z2);
 			VertexP3N3T2 newv2;
 			newv2.position = _lerp_position(tri->v[1].position, tri->v[0].position, t);
@@ -171,16 +233,18 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 			newv2.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[0].text_coord, tri->v[0].position.w, t);
 			tri->v[2] = newv1;
 			tri->v[1] = newv2;
+
 			_triangles_near_far_cull.push_back(tri);
 		}
 		if (z1 < 0 && z2 < 0 && z3 > 0)
 		{
+
 			float t = -z2 / (z3 - z2);
 			VertexP3N3T2 newv1;
 			newv1.position = _lerp_position(tri->v[1].position, tri->v[2].position, t);
 			newv1.normal = _lerp_normal(tri->v[1].normal, tri->v[2].normal, t);
 			newv1.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[2].text_coord, tri->v[2].position.w, t);
-			
+
 			t = -z1 / (z3 - z1);
 			VertexP3N3T2 newv2;
 			newv2.position = _lerp_position(tri->v[0].position, tri->v[2].position, t);
@@ -188,16 +252,18 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 			newv2.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, t);
 			tri->v[1] = newv1;
 			tri->v[0] = newv2;
+
 			_triangles_near_far_cull.push_back(tri);
 		}
 		if (z1 < 0 && z2 > 0 && z3 < 0)
 		{
+
 			float t = -z1 / (z2 - z1);
 			VertexP3N3T2 newv1;
 			newv1.position = _lerp_position(tri->v[0].position, tri->v[1].position, t);
 			newv1.normal = _lerp_normal(tri->v[0].normal, tri->v[1].normal, t);
 			newv1.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[1].text_coord, tri->v[1].position.w, t);
-			
+
 			t = -z3 / (z2 - z3);
 			VertexP3N3T2 newv2;
 			newv2.position = _lerp_position(tri->v[2].position, tri->v[1].position, t);
@@ -205,11 +271,13 @@ void SrRasterizer::near_far_cull(std::vector<SrTriangle*> _triangles, std::vecto
 			newv2.text_coord = _lerp_uv(tri->v[2].text_coord, tri->v[2].position.w, tri->v[1].text_coord, tri->v[1].position.w, t);
 			tri->v[0] = newv1;
 			tri->v[2] = newv2;
+
 			_triangles_near_far_cull.push_back(tri);
+
 		}
-		
+
 	}
-	
+
 }
 
 void SrRasterizer::back_cull(std::vector<SrTriangle*> _triangles, std::vector<SrTriangle*>& _triangles_back_cull)
@@ -219,7 +287,7 @@ void SrRasterizer::back_cull(std::vector<SrTriangle*> _triangles, std::vector<Sr
 		RBVector4 v1 = tri->v[1].position - tri->v[0].position;
 		RBVector4 v2 = tri->v[2].position - tri->v[0].position;
 		RBVector4 cr = v1 ^ v2;
-		RBVector4 z(0,0,1);
+		RBVector4 z(0, 0, 1);
 		float res = RBVector4::dot3(cr, z);
 		if (res<0)
 		{
@@ -239,16 +307,17 @@ void SrRasterizer::clip(std::vector<SrTriangle*> _triangles, std::vector<SrTrian
 	for (auto tri : _triangles)
 	{
 		_triangles_clip.push_back(tri);
-		//≤√ºÙ
+		//Ë£ÅÂâ™
 	}
 }
 
+
 void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vector<SrFragment*>& _triangles_fragments)
 {
-	//_prof.set_begin();
+#ifdef TRI
 	for (auto tri : _triangles)
 	{
-		//∞—◊¯±Í◊™ªªµΩ ”ø⁄
+		//ÊääÂùêÊ†áËΩ¨Êç¢Âà∞ËßÜÂè£
 		tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
 		tri->v[0].position.y = tri->v[0].position.y*0.5*_viewport_h;
 		tri->v[1].position.x = tri->v[1].position.x*0.5*_viewport_w;
@@ -256,85 +325,220 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 		tri->v[2].position.x = tri->v[2].position.x*0.5*_viewport_w;
 		tri->v[2].position.y = tri->v[2].position.y*0.5*_viewport_h;
 
-		//ºÏ≤‚»˝Ω«–Œ «∑ÒÕÀªØŒ™÷±œﬂ
-		
-		if(RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y)||
-			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
-			continue;
-			
-		/*
-		//’˚–ŒªØ
-		tri->v[0].position.x = int (tri->v[0].position.x+0.5);
-		tri->v[0].position.y = int (tri->v[0].position.y+0.5);
-		tri->v[1].position.x = int (tri->v[1].position.x+0.5);
-		tri->v[1].position.y = int (tri->v[1].position.y+0.5);
-		tri->v[2].position.x = int (tri->v[2].position.x+0.5);
-		tri->v[2].position.y = int (tri->v[2].position.y+0.5);
+		//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
 
-		//ºÏ≤‚»˝Ω«–Œ «∑ÒÕÀªØŒ™÷±œﬂ
 		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
 			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
 			continue;
-		*/
 
-		/*
-		float inv_w = 1.f / tri->v[0].position.w;
-		float x1 = tri->v[0].position.x * inv_w*_viewport_w*0.5;
-		float y1 = tri->v[0].position.y * inv_w*_viewport_h*0.5;
-		float z1 = tri->v[0].position.z * inv_w;
-
-		inv_w = 1.f / tri->v[1].position.w;
-		float x2 = tri->v[1].position.x * inv_w*_viewport_w*0.5;
-		float y2 = tri->v[1].position.y * inv_w*_viewport_h*0.5;
-		float z2 = tri->v[1].position.z * inv_w;
-
-		inv_w = 1.f / tri->v[2].position.w;
-		float x3 = tri->v[2].position.x * inv_w*_viewport_w*0.5;
-		float y3 = tri->v[2].position.y * inv_w*_viewport_h*0.5;
-		float z3 = tri->v[2].position.z * inv_w;
-		*/
-		
-		float ym, xm, zm,
-			yu, xu, zu,
-			yd, xd, zd;
-		
-		_sort_y(tri);
-
-		/*
-		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) )
+		_gpu->write_min(tri);
+	}
+#else
+	if (Input::get_key_up(WIP_C))
+	{
+		sss = !sss;
+	}
+	//_prof.set_begin();
+	for (auto tri : _triangles)
+	{
+		//#define DRAW_WIREFRAME
+		if (false)
 		{
-			//◊Û”“≈≈–Ú
-			if (tri->v[0].position.x > tri->v[1].position.x)
+			//ÊääÂùêÊ†áËΩ¨Êç¢Âà∞ËßÜÂè£
+			tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
+			tri->v[0].position.y = tri->v[0].position.y*0.5*_viewport_h;
+			tri->v[1].position.x = tri->v[1].position.x*0.5*_viewport_w;
+			tri->v[1].position.y = tri->v[1].position.y*0.5*_viewport_h;
+			tri->v[2].position.x = tri->v[2].position.x*0.5*_viewport_w;
+			tri->v[2].position.y = tri->v[2].position.y*0.5*_viewport_h;
+
+			//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
+
+			if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
+				RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
+				continue;
+
+
+			auto draw_line = [&](const VertexP3N3T2& a, const VertexP3N3T2& b)->void
 			{
-				VertexP3N3T2 temp = tri->v[1];
-				tri->v[1] = tri->v[0];
-				tri->v[0] = temp;
-			}
-			_set_bottom_tri(tri, _triangles_fragments);
-		}
-		else if (RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y))
-		{
-			//◊Û”“≈≈–Ú
-			if (tri->v[1].position.x > tri->v[2].position.x)
+				int x1 = a.position.x; int y1 = a.position.y;
+				int x2 = b.position.x; int y2 = b.position.y;
+				//ÂèÇÊï∞c‰∏∫È¢úËâ≤ÂÄº
+				int dx = abs(x2 - x1), dy = abs(y2 - y1), yy = 0;
+				if (dx < dy)
+				{
+					yy = 1;
+					int temp = x1;
+					x1 = y1;
+					y1 = temp;
+					temp = x2;
+					x2 = y2;
+					y2 = temp;
+					temp = dx;
+					dx = dy;
+					dy = temp;
+				}
+				int ix = (x2 - x1) > 0 ? 1 : -1, iy = (y2 - y1) > 0 ? 1 : -1, cx = x1, cy = y1, n2dy = dy * 2, n2dydx = (dy - dx) * 2, d = dy * 2 - dx;
+				int i = 0;
+				//Â¶ÇÊûúÁõ¥Á∫ø‰∏éxËΩ¥ÁöÑÂ§πËßíÂ§ß‰∫é45Â∫¶¬†¬†
+				if (yy)
+				{
+					while (cx != x2)
+					{
+						if (d < 0)
+						{
+							d += n2dy;
+						}
+						else
+						{
+							cy += iy;
+							d += n2dydx;
+						}
+						VertexP3N3T2 v;
+						v.position.z = (a.position.z + b.position.z)*0.5f;
+						v.position.x = cy;
+						v.position.y = cx;
+						v.normal = a.normal;
+#ifndef TRI
+						if (_discard_invisible(v))
+							_gpu->write_min(v);
+#endif
+
+						cx += ix;
+						++i;
+					}
+				}
+				//Â¶ÇÊûúÁõ¥Á∫ø‰∏éxËΩ¥ÁöÑÂ§πËßíÂ∞è‰∫é45Â∫¶¬†
+				else
+				{
+					while (cx != x2)
+					{
+						if (d < 0)
+						{
+							d += n2dy;
+						}
+						else
+						{
+							cy += iy;
+							d += n2dydx;
+						}
+						VertexP3N3T2 v;
+						v.position.z = (a.position.z + b.position.z)*0.5f;
+						v.position.x = cx;
+						v.position.y = cy;
+						v.normal = a.normal;
+#ifndef TRI
+						if (_discard_invisible(v))
+							_gpu->write_min(v);
+#endif
+						cx += ix;
+						++i;
+					}
+				}
+			};
+
+			draw_line(tri->v[0], tri->v[1]);
+			draw_line(tri->v[1], tri->v[2]);
+			draw_line(tri->v[2], tri->v[0]);
+
+
+#ifndef TRI
+			for (int i = 0; i < 3; ++i)
 			{
-				VertexP3N3T2 temp = tri->v[1];
-				tri->v[1] = tri->v[2];
-				tri->v[2] = temp;
+				VertexP3N3T2 &vr = tri->v[i];
+				VertexP3N3T2 v = vr;
+				v.position.x += 1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				v = vr;
+				v.position.x -= 1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				v = vr;
+				v.position.y += 1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				v = vr;
+				v.position.y -= 1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				v = vr;
+				v.position.x += 1;
+				v.position.y += 1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+
+
+				v = vr;
+				v.position.x += -1;
+				v.position.y += -1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				v = vr;
+				v.position.x += -1;
+				v.position.y += 1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				v = vr;
+				v.position.x += 1;
+				v.position.y += -1;
+				if (_discard_invisible(v))
+
+					_gpu->write_min(v);
+
+				if (_discard_invisible(vr))
+
+					_gpu->write_min(vr);
+
 			}
-			_set_top_tri(tri, _triangles_fragments);
+#endif
+
+
 		}
 		else
-		*/
 		{
-		
-			//_set_tri(tri, _triangles_fragments);
-			//_new_set_tri(tri, _triangles_fragments);
-			_new_set_tri2(tri, _triangles_fragments);
-		}
+			//ÊääÂùêÊ†áËΩ¨Êç¢Âà∞ËßÜÂè£
+			tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
+			tri->v[0].position.y = tri->v[0].position.y*0.5*_viewport_h;
+			tri->v[1].position.x = tri->v[1].position.x*0.5*_viewport_w;
+			tri->v[1].position.y = tri->v[1].position.y*0.5*_viewport_h;
+			tri->v[2].position.x = tri->v[2].position.x*0.5*_viewport_w;
+			tri->v[2].position.y = tri->v[2].position.y*0.5*_viewport_h;
 
+			//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
+
+			if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
+				RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
+				continue;
+
+
+			float ym, xm, zm,
+				yu, xu, zu,
+				yd, xd, zd;
+
+			_sort_y(tri);
+			_new_set_tri2(tri, _triangles_fragments);
+
+		}
+		//delete tri;
 	}
 	//_prof.set_end(0);
 	//_prof.out_put_after_time(20);
+#endif
 }
 
 void SrRasterizer::shade(std::vector<SrFragment*>& _triangles_fragments)
@@ -346,6 +550,358 @@ void SrRasterizer::shade(std::vector<SrFragment*>& _triangles_fragments)
 void SrRasterizer::merge(std::vector<SrFragment*>& _triangles_fragments, SrSSBuffer<RBColor32>& color, SrSSBuffer<float>& depth)
 {
 	_stage_om->proccess(_triangles_fragments, color, depth);
+}
+
+void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* _stage_ps, SrStageOM* _stage_om)
+{
+	//!!!ÊÄßËÉΩissue
+	//SrFragment* frg = new SrFragment();
+	//Áî®‰∫éÂà§Êñ≠Â∑¶Âè≥‰∏âËßí
+	float tc = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
+	float xc = tri->v[0].position.x*(1 - tc) + tri->v[2].position.x*tc;
+
+	//0->2
+	if (tri->v[1].position.x >= xc)
+	{
+		//y‰∏≠ÁÇπÂú®Âè≥Ëæπ
+		float x0 = tri->v[0].position.x;
+		int y0 = ceil(tri->v[0].position.y - 0.5);
+		float x1 = tri->v[1].position.x;
+		int y1 = ceil(tri->v[1].position.y - 0.5);
+		float x2 = tri->v[2].position.x;
+		int y2 = ceil(tri->v[2].position.y - 0.5);
+
+		tri->v[0].position.y = y0;
+		tri->v[1].position.y = y1;
+		tri->v[2].position.y = y2;
+
+		//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
+
+		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
+			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
+			return;
+
+
+		float dx_left_02 = (tri->v[2].position.x - tri->v[0].position.x) / (tri->v[2].position.y - tri->v[0].position.y);
+
+		float dx_right_12 = (tri->v[2].position.x - tri->v[1].position.x) / (tri->v[2].position.y - tri->v[1].position.y);
+		float dx_right_01 = (tri->v[1].position.x - tri->v[0].position.x) / (tri->v[1].position.y - tri->v[0].position.y);
+
+		VertexP3N3T2 ph;
+		VertexP3N3T2 ph1;
+		VertexP3N3T2 p11;
+		VertexP3N3T2 p21;
+		VertexP3N3T2 p22;
+
+		float tempt = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
+		ph.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
+		ph.position.y = RBMath::round_f(ph.position.y);
+		ph.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
+		ph.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
+		ph1.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
+		ph1.position.y = RBMath::round_f(ph1.position.y);
+		ph1.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
+		ph1.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[1].position.y - tri->v[0].position.y);
+		p11.position = _lerp_position(tri->v[0].position, tri->v[1].position, tempt);
+		p11.position.y = RBMath::round_f(p11.position.y);
+		p11.normal = _lerp_normal(tri->v[0].normal, tri->v[1].normal, tempt);
+		p11.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[1].text_coord, tri->v[1].position.w, tempt);
+
+		tempt = (tri->v[2].position.y - 1 - ph.position.y) / (y2 - ph.position.y);
+		p21.position = _lerp_position(ph.position, tri->v[2].position, tempt);
+		p21.position.y = RBMath::round_f(p21.position.y);
+		p21.normal = _lerp_normal(ph.normal, tri->v[2].normal, tempt);
+		p21.text_coord = _lerp_uv(ph.text_coord, ph.position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		p22.position = _lerp_position(tri->v[1].position, tri->v[2].position, tempt);
+		p22.position.y = RBMath::round_f(p22.position.y);
+		p22.normal = _lerp_normal(tri->v[1].normal, tri->v[2].normal, tempt);
+		p22.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		VertexP3N3T2 vs;
+		VertexP3N3T2 ve;
+
+		float t = 0.f;
+		int loop_y = 0;
+		float dyl = ph1.position.y - y0;
+		float dyr = p11.position.y - y0;
+		float xs = x0;
+		float xe = x0;
+		for (loop_y = y0; loop_y <= ph1.position.y; ++loop_y)
+		{
+			if (RBMath::is_nearly_equal(dyl, 0.f))
+			{
+				t = 0;
+			}
+			else
+			{
+				t = (loop_y - y0) / dyl;
+			}
+
+			vs.position = _lerp_position(tri->v[0].position, ph1.position, t);
+			vs.position.y = loop_y;
+			vs.position.x = xs;
+			vs.normal = _lerp_normal(tri->v[0].normal, ph1.normal, t);
+			vs.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, ph1.text_coord, ph1.position.w, t);
+
+			//t = (loop_y - y0) / dyr;
+			//ve.position = _lerp_position(tri->v[0].position, tri->v[1].position, t);
+			ve.position = _lerp_position(tri->v[0].position, p11.position, t);
+			ve.position.y = loop_y;
+			ve.position.x = xe;
+			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
+			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
+
+			if (new_scan_line(vs, ve,_stage_ps,_stage_om))
+				return;
+
+			xs += dx_left_02;
+			xe += dx_right_01;
+		}
+
+		dyl = y2 - 1 - ph.position.y;
+		dyr = y2 - 1 - y1;
+		xs = ph.position.x;
+		xe = x1;
+		for (loop_y = ph.position.y; loop_y < y2; ++loop_y)
+		{
+			if (RBMath::is_nearly_equal(dyl, 0.f))
+			{
+				t = 0;
+			}
+			else
+			{
+				t = (loop_y - ph.position.y) / dyl;
+			}
+
+			vs.position = _lerp_position(ph.position, p21.position, t);
+			vs.position.y = loop_y;
+			vs.position.x = xs;
+			vs.normal = _lerp_normal(ph.normal, p21.normal, t);
+			vs.text_coord = _lerp_uv(ph.text_coord, ph.position.w, p21.text_coord, p21.position.w, t);
+
+			//t = (loop_y - ph.position.y) / dyr;
+			//ve.position = _lerp_position(tri->v[0].position, tri->v[1].position, t);
+			ve.position = _lerp_position(tri->v[1].position, p22.position, t);
+			ve.position.y = loop_y;
+			ve.position.x = xe;
+			ve.normal = _lerp_normal(tri->v[1].normal, p22.normal, t);
+			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
+
+			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+				return;
+
+			xs += dx_left_02;
+			xe += dx_right_12;
+		}
+
+		//RBlog("line\n");
+	}
+	else
+	{
+		//y‰∏≠ÁÇπÂú®Â∑¶Ëæπ
+		float x0 = tri->v[0].position.x;
+		int y0 = ceil(tri->v[0].position.y - 0.5);
+		float x1 = tri->v[1].position.x;
+		int y1 = ceil(tri->v[1].position.y - 0.5);
+		float x2 = tri->v[2].position.x;
+		int y2 = ceil(tri->v[2].position.y - 0.5);
+
+		tri->v[0].position.y = y0;
+		tri->v[1].position.y = y1;
+		tri->v[2].position.y = y2;
+
+		//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
+		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
+			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
+			return;
+
+		float dx_right_02 = (tri->v[2].position.x - tri->v[0].position.x) / (tri->v[2].position.y - tri->v[0].position.y);
+
+		float dx_left_12 = (tri->v[2].position.x - tri->v[1].position.x) / (tri->v[2].position.y - tri->v[1].position.y);
+		float dx_left_01 = (tri->v[1].position.x - tri->v[0].position.x) / (tri->v[1].position.y - tri->v[0].position.y);
+
+		VertexP3N3T2 ph;
+		VertexP3N3T2 ph1;
+		VertexP3N3T2 p11;
+		VertexP3N3T2 p21;
+		VertexP3N3T2 p22;
+
+		float tempt = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
+		ph.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
+		ph.position.y = RBMath::round_f(ph.position.y);
+		ph.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
+		ph.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
+		ph1.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
+		ph1.position.y = RBMath::round_f(ph1.position.y);
+		ph1.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
+		ph1.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		tempt = (tri->v[1].position.y - 1 - tri->v[0].position.y) / (tri->v[1].position.y - tri->v[0].position.y);
+		p11.position = _lerp_position(tri->v[0].position, tri->v[1].position, tempt);
+		p11.position.y = RBMath::round_f(p11.position.y);
+		p11.normal = _lerp_normal(tri->v[0].normal, tri->v[1].normal, tempt);
+		p11.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[1].text_coord, tri->v[1].position.w, tempt);
+
+		tempt = (tri->v[2].position.y - 1 - ph.position.y) / (y2 - ph.position.y);
+		p21.position = _lerp_position(ph.position, tri->v[2].position, tempt);
+		p21.position.y = RBMath::round_f(p21.position.y);
+		p21.normal = _lerp_normal(ph.normal, tri->v[2].normal, tempt);
+		p21.text_coord = _lerp_uv(ph.text_coord, ph.position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		p22.position = _lerp_position(tri->v[1].position, tri->v[2].position, tempt);
+		p22.position.y = RBMath::round_f(p22.position.y);
+		p22.normal = _lerp_normal(tri->v[1].normal, tri->v[2].normal, tempt);
+		p22.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
+
+		VertexP3N3T2 vs;
+		VertexP3N3T2 ve;
+
+		float t = 0.f;
+		int loop_y = 0;
+		float dyl = ph1.position.y - y0;
+		float dyr = p11.position.y - y0;
+		float xs = x0;
+		float xe = x0;
+		for (loop_y = y0; loop_y <= ph1.position.y; ++loop_y)
+		{
+
+
+			if (RBMath::is_nearly_equal(dyl, 0.f))
+			{
+				t = 0;
+			}
+			else
+			{
+				t = (loop_y - y0) / dyl;
+			}
+
+			vs.position = _lerp_position(tri->v[0].position, ph1.position, t);
+			vs.position.y = loop_y;
+			/*
+			if (abs(xs - vs.position.x)<0.001)
+			{
+			xs += dx_right_02;
+			xe += dx_left_01;
+			continue;
+			}
+			*/
+			vs.position.x = xs;
+			vs.normal = _lerp_normal(tri->v[0].normal, ph1.normal, t);
+			vs.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, ph1.text_coord, ph1.position.w, t);
+
+			//t = (loop_y - y0) / dyr;
+			//ve.position = _lerp_position(tri->v[0].position, tri->v[1].position, t);
+			ve.position = _lerp_position(tri->v[0].position, p11.position, t);
+			ve.position.y = loop_y;
+
+			ve.position.x = xe;
+
+			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
+			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
+
+			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+				return;
+
+			xs += dx_right_02;
+			xe += dx_left_01;
+		}
+
+		dyl = y2 - 1 - ph.position.y;
+		dyr = y2 - 1 - y1;
+		xs = ph.position.x;
+		xe = x1;
+		for (loop_y = ph.position.y; loop_y < y2; ++loop_y)
+		{
+			if (RBMath::is_nearly_equal(dyl, 0.f))
+			{
+				t = 0;
+			}
+			else
+			{
+				t = (loop_y - ph.position.y) / dyl;
+			}
+			vs.position = _lerp_position(ph.position, p21.position, t);
+			vs.position.y = loop_y;
+			vs.position.x = xs;
+			vs.normal = _lerp_normal(ph.normal, p21.normal, t);
+			vs.text_coord = _lerp_uv(ph.text_coord, ph.position.w, p21.text_coord, p21.position.w, t);
+
+			//t = (loop_y - ph.position.y) / dyr;
+			//ve.position = _lerp_position(tri->v[0].position, tri->v[1].position, t);
+			ve.position = _lerp_position(tri->v[1].position, p22.position, t);
+			ve.position.y = loop_y;
+			ve.position.x = xe;
+			ve.normal = _lerp_normal(tri->v[1].normal, p22.normal, t);
+			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
+
+			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+				return;
+
+			xs += dx_right_02;
+			xe += dx_left_12;
+		}
+
+	}
+
+}
+
+bool SrRasterizer::new_scan_line(VertexP3N3T2 & sv, VertexP3N3T2 & ev, SrStagePS* stage_ps, SrStageOM* stage_om)
+{
+	sv.position.x = ceil(sv.position.x - 0.5);
+	ev.position.x = ceil(ev.position.x - 0.5);
+	//RBlog("line\n");
+	if (!RBMath::is_nearly_equal(ev.position.y, sv.position.y))
+		return false;
+
+	float t = 0;
+	float dx = ev.position.x - sv.position.x + 1;
+	int loop_x;
+	for (loop_x = 0; loop_x < ev.position.x - sv.position.x; ++loop_x)
+	{
+		t = loop_x / dx;
+
+		VertexP3N3T2 v;
+		//ÊèíÂÄºÊ∂àËÄó‰∫Ü‰∏ÄÂçäÁöÑÊó∂Èó¥ 14 total
+		//1~2
+		v.position = _lerp_position(sv.position, ev.position, t);
+		//2~3
+		v.position.x = sv.position.x + loop_x;
+		v.position.y = int(sv.position.y - 0.5);
+		//~2
+		v.normal = _lerp_normal(sv.normal, ev.normal, t);
+		//~2
+		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);
+
+
+		//~7
+		//_stage_ps->proccess(v);
+		//~3
+		//_stage_om->proccess(v, *_color_buffer, *_depth_buffer);
+
+
+		//Â¶ÇÊûúÂ∏ßÁéáÂ§™‰ΩéÁõ¥Êé•Ë∑≥Ëøá‰∏çÂ§ÑÁêÜ
+
+		//
+		//_total_frag++;
+
+
+
+		if (_discard_invisible(v))
+		{
+			_stage_ps->proccess(v);
+			_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+		}
+
+	}
+	return false;
+
 }
 
 void SrRasterizer::_sort_y(SrTriangle* tri)
@@ -370,90 +926,34 @@ void SrRasterizer::_sort_y(SrTriangle* tri)
 		tri->v[2] = temp;
 	}
 
-	/*
-	if ((y1 > y2&&y2<y3) || (y2>y3&&y2 < y1))
-	{
-		ym = y2;
-		xm = x2;
-		zm = z2;
-
-		if (y1 > y2)
-		{
-			yu = y1; yd = y3;
-			xu = x1; xd = x3;
-			zu = z1; zd = z3;
-		}
-		else
-		{
-			yu = y3; yd = y1;
-			xu = x3; xd = x1;
-			zu = z3; zd = z1;
-		}
-	}
-	if ((y2 < y1&&y1<y3) || (y1>y3&&y1 < y2))
-	{
-		ym = y1;
-		xm = x1;
-		zm = z1;
-		if (y1 < y2)
-		{
-			yu = y2; yd = y3;
-			xu = x2; xd = x3;
-			zu = z2; zd = z3;
-		}
-		else
-		{
-			yu = y3; yd = y1;
-			xu = x3; xd = x1;
-			zu = z3; zd = z1;
-		}
-	}
-	if ((y3 > y1&&y3<y2) || (y3>y2&&y3 < y1))
-	{
-		ym = y3;
-		xm = x3;
-		zm = z3;
-		if (y3 < y1)
-		{
-			yu = y1; yd = y2;
-			xu = x1; xd = x2;
-			zu = z1; zd = z2;
-		}
-		else
-		{
-			yu = y2; yd = y1;
-			xu = x2; xd = x1;
-			zu = z2; zd = z1;
-		}
-	}
-	*/
+	
 }
 
 void SrRasterizer::_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments)
 {
 
 	//!!!!!!
-	//«–≥ˆ¿¥µƒ–¬∂•µ„‘⁄ceil¡À÷Æ∫Û≤ª“ª∂®‘⁄Õ¨“ªÃıœﬂ…œ£¨À˘“‘µº÷¬º∆À„≥ˆ¿¥µƒ ˝æ›≤Óæ‡∫‹¥Û°£
+	//ÂàáÂá∫Êù•ÁöÑÊñ∞È°∂ÁÇπÂú®ceil‰∫Ü‰πãÂêé‰∏ç‰∏ÄÂÆöÂú®Âêå‰∏ÄÊù°Á∫ø‰∏äÔºåÊâÄ‰ª•ÂØºËá¥ËÆ°ÁÆóÂá∫Êù•ÁöÑÊï∞ÊçÆÂ∑ÆË∑ùÂæàÂ§ß„ÄÇ
 
 	//float new_x = tri->v[2].normal.x + (tri->v[2].position.y - tri->v[1].position.y) / (tri->v[2].position.y - tri->v[0].position.y)*(tri->v[0].position.x - tri->v[2].position.x);
 	VertexP3N3T2 new_v;
 	float t = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
-	new_v.position = _lerp_position(tri->v[0].position, tri->v[2].position,t);
+	new_v.position = _lerp_position(tri->v[0].position, tri->v[2].position, t);
 	new_v.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, t);
 	new_v.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, t);
 
 
 
 	SrTriangle up_tri(VertexP3N3T2(tri->v[0]), VertexP3N3T2(tri->v[1]), new_v);
-	//◊Û”“≈≈–Ú<
+	//Â∑¶Âè≥ÊéíÂ∫è<
 	if (up_tri.v[1].position.x > up_tri.v[2].position.x)
 	{
 		VertexP3N3T2 temp = up_tri.v[1];
 		up_tri.v[1] = up_tri.v[2];
 		up_tri.v[2] = temp;
 	}
-	SrTriangle down_tri(new_v,VertexP3N3T2(tri->v[1]), VertexP3N3T2(tri->v[2]));
-	//◊Û”“≈≈–Ú<
+	SrTriangle down_tri(new_v, VertexP3N3T2(tri->v[1]), VertexP3N3T2(tri->v[2]));
+	//Â∑¶Âè≥ÊéíÂ∫è<
 	if (down_tri.v[0].position.x > down_tri.v[1].position.x)
 	{
 		VertexP3N3T2 temp = down_tri.v[1];
@@ -461,8 +961,8 @@ void SrRasterizer::_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangle
 		down_tri.v[0] = temp;
 	}
 
-	_set_bottom_tri(&down_tri,_triangles_fragments);
-	_set_top_tri(&up_tri,_triangles_fragments);
+	_set_bottom_tri(&down_tri, _triangles_fragments);
+	_set_top_tri(&up_tri, _triangles_fragments);
 }
 
 void SrRasterizer::_set_top_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments)
@@ -488,7 +988,7 @@ void SrRasterizer::_set_top_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 	tri->v[2].position.y = y2;
 	*/
 
-	//ºÏ≤‚»˝Ω«–Œ «∑ÒÕÀªØŒ™÷±œﬂ
+	//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
 	if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
 		RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
 		return;
@@ -502,8 +1002,8 @@ void SrRasterizer::_set_top_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 	float xs = x0, xe = x0;
 	float loop_x = 0;
 	float t;
-	float dy = y2 - y0+1;
-	for (loop_y = 0; loop_y < y2-y0; ++loop_y)
+	float dy = y2 - y0 + 1;
+	for (loop_y = 0; loop_y < y2 - y0; ++loop_y)
 	{
 
 		char a[64];
@@ -572,8 +1072,8 @@ void SrRasterizer::_set_bottom_tri(SrTriangle* tri, std::vector<SrFragment*>& _t
 	float xs = x0, xe = x1;
 	float loop_x = 0;
 	float t;
-	float dy = y2 - y0 +1;
-	for (loop_y = 0;loop_y<y2-y0;++loop_y)
+	float dy = y2 - y0 + 1;
+	for (loop_y = 0; loop_y<y2 - y0; ++loop_y)
 	{
 		t = loop_y / dy;
 		char a[64];
@@ -581,11 +1081,11 @@ void SrRasterizer::_set_bottom_tri(SrTriangle* tri, std::vector<SrFragment*>& _t
 		//RBlog(a);
 
 		VertexP3N3T2 vs;
-		vs.position = _lerp_position(tri->v[0].position,tri->v[2].position,t);
+		vs.position = _lerp_position(tri->v[0].position, tri->v[2].position, t);
 		vs.position.y = loop_y + y0;
 		vs.position.x = xs;
-		vs.normal = _lerp_normal(tri->v[0].normal,tri->v[2].normal,t);
-		vs.text_coord = _lerp_uv(tri->v[0].text_coord,tri->v[0].position.w,tri->v[2].text_coord,tri->v[2].position.w,t);
+		vs.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, t);
+		vs.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, t);
 
 		VertexP3N3T2 ve;
 		ve.position = _lerp_position(tri->v[1].position, tri->v[2].position, t);
@@ -606,10 +1106,10 @@ void SrRasterizer::_set_bottom_tri(SrTriangle* tri, std::vector<SrFragment*>& _t
 
 void SrRasterizer::_new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments)
 {
-	//!!!–‘ƒ‹issue
+	//!!!ÊÄßËÉΩissue
 	SrFragment* frg = new SrFragment();
 	/*
-	//◊Û”“≈≈–Ú<
+	//Â∑¶Âè≥ÊéíÂ∫è<
 	if (tri->v[0].position.x > tri->v[1].position.x)
 	{
 	VertexP3N3T2 temp = tri->v[1];
@@ -617,17 +1117,17 @@ void SrRasterizer::_new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 	tri->v[0] = temp;
 	}
 	*/
-	//”√”⁄≈–∂œ◊Û”“»˝Ω«
+	//Áî®‰∫éÂà§Êñ≠Â∑¶Âè≥‰∏âËßí
 	float tc = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 	float xc = tri->v[0].position.x*(1 - tc) + tri->v[2].position.x*tc;
 
 	//0->2
 	if (tri->v[1].position.x > xc)
 	{
-		//y÷–µ„‘⁄”“±ﬂ
+		//y‰∏≠ÁÇπÂú®Âè≥Ëæπ
 		int i = 0;
 
-		//y÷–µ„‘⁄”“±ﬂ
+		//y‰∏≠ÁÇπÂú®Âè≥Ëæπ
 		float dx_left_02 = (tri->v[2].position.x - tri->v[0].position.x) / (tri->v[2].position.y - tri->v[0].position.y);
 
 		float dx_right_12 = (tri->v[2].position.x - tri->v[1].position.x) / (tri->v[2].position.y - tri->v[1].position.y);
@@ -743,11 +1243,11 @@ void SrRasterizer::_new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 
 		i = 0;
 
-		
+
 	}
-	else 
+	else
 	{
-		//y÷–µ„‘⁄◊Û±ﬂ
+		//y‰∏≠ÁÇπÂú®Â∑¶Ëæπ
 		float dx_right_02 = (tri->v[2].position.x - tri->v[0].position.x) / (tri->v[2].position.y - tri->v[0].position.y);
 
 		float dx_left_12 = (tri->v[2].position.x - tri->v[1].position.x) / (tri->v[2].position.y - tri->v[1].position.y);
@@ -802,8 +1302,8 @@ void SrRasterizer::_new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 		vs.position = _lerp_position(tri->v[0].position, tri->v[2].position, (loop_y) / dy);
 		vs.position.y = y1;
 		vs.position.x = xs;
-		vs.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, (loop_y ) / dy);
-		vs.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, (loop_y ) / dy);
+		vs.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, (loop_y) / dy);
+		vs.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, (loop_y) / dy);
 		vnew = vs;
 
 		dy = y2 - y1 + 1;
@@ -842,16 +1342,16 @@ void SrRasterizer::_new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 
 void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments)
 {
-	//!!!–‘ƒ‹issue
+	//!!!ÊÄßËÉΩissue
 	//SrFragment* frg = new SrFragment();
-	//”√”⁄≈–∂œ◊Û”“»˝Ω«
+	//Áî®‰∫éÂà§Êñ≠Â∑¶Âè≥‰∏âËßí
 	float tc = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 	float xc = tri->v[0].position.x*(1 - tc) + tri->v[2].position.x*tc;
 
 	//0->2
 	if (tri->v[1].position.x >= xc)
 	{
-		//y÷–µ„‘⁄”“±ﬂ
+		//y‰∏≠ÁÇπÂú®Âè≥Ëæπ
 		float x0 = tri->v[0].position.x;
 		int y0 = ceil(tri->v[0].position.y - 0.5);
 		float x1 = tri->v[1].position.x;
@@ -863,10 +1363,12 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 		tri->v[1].position.y = y1;
 		tri->v[2].position.y = y2;
 
-		//ºÏ≤‚»˝Ω«–Œ «∑ÒÕÀªØŒ™÷±œﬂ
+		//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
+		
 		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
 			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
 			return;
+			
 
 		float dx_left_02 = (tri->v[2].position.x - tri->v[0].position.x) / (tri->v[2].position.y - tri->v[0].position.y);
 
@@ -899,12 +1401,12 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 
 		tempt = (tri->v[2].position.y - 1 - ph.position.y) / (y2 - ph.position.y);
 		p21.position = _lerp_position(ph.position, tri->v[2].position, tempt);
-		p21.position.y = RBMath::round_f(p21.position.y );
+		p21.position.y = RBMath::round_f(p21.position.y);
 		p21.normal = _lerp_normal(ph.normal, tri->v[2].normal, tempt);
 		p21.text_coord = _lerp_uv(ph.text_coord, ph.position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
 		p22.position = _lerp_position(tri->v[1].position, tri->v[2].position, tempt);
-		p22.position.y = RBMath::round_f(p22.position.y );
+		p22.position.y = RBMath::round_f(p22.position.y);
 		p22.normal = _lerp_normal(tri->v[1].normal, tri->v[2].normal, tempt);
 		p22.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
@@ -927,7 +1429,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			{
 				t = (loop_y - y0) / dyl;
 			}
-			
+
 			vs.position = _lerp_position(tri->v[0].position, ph1.position, t);
 			vs.position.y = loop_y;
 			vs.position.x = xs;
@@ -942,7 +1444,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
 
-			if(scan_line(vs, ve))
+			if (scan_line(vs, ve))
 				return;
 
 			xs += dx_left_02;
@@ -963,7 +1465,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			{
 				t = (loop_y - ph.position.y) / dyl;
 			}
-			
+
 			vs.position = _lerp_position(ph.position, p21.position, t);
 			vs.position.y = loop_y;
 			vs.position.x = xs;
@@ -978,7 +1480,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[1].normal, p22.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
 
-			if(scan_line(vs, ve))
+			if (scan_line(vs, ve))
 				return;
 
 			xs += dx_left_02;
@@ -989,7 +1491,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 	}
 	else
 	{
-		//y÷–µ„‘⁄◊Û±ﬂ
+		//y‰∏≠ÁÇπÂú®Â∑¶Ëæπ
 		float x0 = tri->v[0].position.x;
 		int y0 = ceil(tri->v[0].position.y - 0.5);
 		float x1 = tri->v[1].position.x;
@@ -1001,7 +1503,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 		tri->v[1].position.y = y1;
 		tri->v[2].position.y = y2;
 
-		//ºÏ≤‚»˝Ω«–Œ «∑ÒÕÀªØŒ™÷±œﬂ
+		//Ê£ÄÊµã‰∏âËßíÂΩ¢ÊòØÂê¶ÈÄÄÂåñ‰∏∫Áõ¥Á∫ø
 		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
 			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
 			return;
@@ -1019,7 +1521,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 
 		float tempt = (tri->v[1].position.y - tri->v[0].position.y) / (tri->v[2].position.y - tri->v[0].position.y);
 		ph.position = _lerp_position(tri->v[0].position, tri->v[2].position, tempt);
-		ph.position.y =  RBMath::round_f(ph.position.y );
+		ph.position.y = RBMath::round_f(ph.position.y);
 		ph.normal = _lerp_normal(tri->v[0].normal, tri->v[2].normal, tempt);
 		ph.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, tri->v[2].text_coord, tri->v[2].position.w, tempt);
 
@@ -1067,15 +1569,17 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			{
 				t = (loop_y - y0) / dyl;
 			}
-			
+
 			vs.position = _lerp_position(tri->v[0].position, ph1.position, t);
 			vs.position.y = loop_y;
-			if (abs(xs - vs.position.x)>0.001)
+			/*
+			if (abs(xs - vs.position.x)<0.001)
 			{
 				xs += dx_right_02;
 				xe += dx_left_01;
 				continue;
 			}
+			*/
 			vs.position.x = xs;
 			vs.normal = _lerp_normal(tri->v[0].normal, ph1.normal, t);
 			vs.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, ph1.text_coord, ph1.position.w, t);
@@ -1090,7 +1594,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
 
-			if(scan_line(ve, vs))
+			if (scan_line(ve, vs))
 				return;
 
 			xs += dx_right_02;
@@ -1133,7 +1637,7 @@ void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _tri
 		}
 		//RBlog("line\n");
 	}
-	
+
 	//_triangles_fragments.push_back(frg);
 
 }
@@ -1155,7 +1659,7 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 		t = loop_x / dx;
 
 		VertexP3N3T2 v;
-		//≤Â÷µœ˚∫ƒ¡À“ª∞Îµƒ ±º‰ 14 total
+		//ÊèíÂÄºÊ∂àËÄó‰∫Ü‰∏ÄÂçäÁöÑÊó∂Èó¥ 14 total
 		//1~2
 		v.position = _lerp_position(sv.position, ev.position, t);
 		//2~3
@@ -1164,21 +1668,21 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 		//~2
 		v.normal = _lerp_normal(sv.normal, ev.normal, t);
 		//~2
-		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);		
-		
-		
+		v.text_coord = _lerp_uv(sv.text_coord, sv.position.w, ev.text_coord, ev.position.w, t);
+
+
 		//~7
 		//_stage_ps->proccess(v);
 		//~3
 		//_stage_om->proccess(v, *_color_buffer, *_depth_buffer);
-		
 
-		//»Áπ˚÷°¬ Ã´µÕ÷±Ω”Ã¯π˝≤ª¥¶¿Ì
+
+		//Â¶ÇÊûúÂ∏ßÁéáÂ§™‰ΩéÁõ¥Êé•Ë∑≥Ëøá‰∏çÂ§ÑÁêÜ
 
 		//
-		_total_frag++;
+		//_total_frag++;
 
-		
+
 #define OP_
 #ifdef OP
 		if (_last_ts_time < 120)
@@ -1191,7 +1695,10 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 			return true;
 		}
 #else
-		_gpu->write_min(v);
+#ifndef TRI
+		if (_discard_invisible(v))
+			_gpu->write_min(v);
+#endif
 #endif
 
 		/*
@@ -1208,6 +1715,24 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 	return false;
 }
 
+bool SrRasterizer::_discard_invisible(const VertexP3N3T2 & data)
+{
+	if (data.position.z <= 0|| data.position.z>=1)
+	{
+		return false;
+	}
+	if (data.position.x < -_viewport_w*0.5f || data.position.x > _viewport_w*0.5f)
+	{
+		return false;
+	}
+	if (data.position.y < -_viewport_h*0.5f || data.position.y > _viewport_h*0.5f)
+	{
+		return false;
+	}
+	_total_frag++;
+	return true;
+}
+
 void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _triangle_fragment)
 {
 	//char a[64];
@@ -1216,10 +1741,10 @@ void SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrFragment* _tr
 
 	sv.position.x = ceil(sv.position.x - 0.5);
 	ev.position.x = ceil(ev.position.x - 0.5);
-	
 
 
-	
+
+
 	//RBlog("line\n");
 	if (!RBMath::is_nearly_equal(ev.position.y, sv.position.y))
 		return;
@@ -1259,8 +1784,8 @@ RBVector3 SrRasterizer::_lerp_normal(RBVector3 start, RBVector3 end, float t)
 
 RBVector2 SrRasterizer::_lerp_uv(RBVector2 start, float sz, RBVector2 end, float ez, float t)
 {
-	float factor = 1/(sz*(t) + (1-t)*ez);
-	RBVector2 v = (ez*start*(1-t) + t*sz*end)*factor;
+	float factor = 1 / (sz*(t)+(1 - t)*ez);
+	RBVector2 v = (ez*start*(1 - t) + t*sz*end)*factor;
 	//v = (1 - t)* start + t* end;
 	return v;
 }

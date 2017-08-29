@@ -5,6 +5,10 @@
 class BaseShaderPS : public SrShaderPixel
 {
 public:
+	float lum(const RBColorf& c)
+	{
+		return c.r*0.299 + 0.587*c.g + c.b*0.114;
+	}
 	//作为成员变量线程不安全！
 	RBColorf shade(VertexP3N3T2& vert_lerp)
 	{
@@ -26,7 +30,7 @@ public:
 		v = v.get_abs();
 		v.normalize();
 
-		RBVector3 light(0,1,0);
+		RBVector3 light(0,-12.2,1);
 
 		RBVector3 half = light + v;
 		half.normalize();
@@ -52,6 +56,10 @@ public:
 
 		RBColorf c =outc* tc + abt*tc;
 
+		c.r = RBMath::pow(c.r, 1/2.2);
+		c.g = RBMath::pow(c.g, 1 / 2.2);
+		c.b = RBMath::pow(c.b, 1 / 2.2);
+
 		c.a = RBMath::clamp(c.a, 0.f, 1.f);
 		c.r = RBMath::clamp(c.r, 0.f, 1.f);
 		c.g = RBMath::clamp(c.g, 0.f, 1.f);
@@ -61,6 +69,8 @@ public:
 			//c = RBColorf::black;
 		//c = RBVector4(vert_lerp.normal, 1);
 		
+	
+
 		return c;
 	}
 

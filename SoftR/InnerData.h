@@ -10,6 +10,11 @@ struct SrTriangle
 {
 	VertexP3N3T2 v[3];
 
+	SrTriangle()
+	{
+		v[0].finish = true;
+	}
+
 	SrTriangle(VertexP3N3T2 v1, VertexP3N3T2 v2, VertexP3N3T2 v3)
 	{
 		v[0] = v1;
@@ -21,7 +26,10 @@ struct SrTriangle
 	{
 
 #ifdef POOL
+		
 		return pool->alloc(&nodes, size);
+		//printf("new\n");
+		//print_mem();
 #else
 		return frame->alloc(size, false);
 #endif
@@ -35,6 +43,8 @@ struct SrTriangle
 
 
 		pool->free(&nodes, p, sizeof(SrTriangle));
+		//printf("delete\n");
+		//print_mem();
 #endif
 	}
 	
@@ -44,6 +54,7 @@ struct SrTriangle
 		pool = RBPoolAllctor::instance();
 		nodes = nullptr;
 		pool->new_pool(&nodes, sizeof(SrTriangle));
+		print_mem();
 #else   
 
 		frame = new RBFrameAlloctor();
@@ -74,7 +85,7 @@ struct SrTriangle
 	
 	void print()
 	{
-		printf("%d:%f\n",this,v[1].normal.x);
+		printf("%02X:%f\n",this,v[1].normal.x);
 	}
 #ifdef POOL
 	static void* nodes;
@@ -97,12 +108,32 @@ struct SrFragment
 template <class T>
 struct SrSSBuffer
 {
+	SrSSBuffer(const SrSSBuffer<T>& c)
+	{
+		this->w = c.w;
+		this->h = c.h;
+		_buffer.resize(w*h);
+		offset = w * sizeof(T);
+		size = w*h * sizeof(T);
+		memcpy(&_buffer[0], &c._buffer[0], size);
+	}
+
 	SrSSBuffer()
 	{
 		w = 0;
 		h = 0;
 		offset = 0;
 		size = 0;
+	}
+
+	void clone(const SrSSBuffer<T>& c)
+	{
+		this->w = c.w;
+		this->h = c.h;
+		_buffer.resize(w*h);
+		offset = w * sizeof(T);
+		size = w*h * sizeof(T);
+		memcpy(&_buffer[0], &c._buffer[0], size);
 	}
 
 	void init(int w,int h)
@@ -132,7 +163,7 @@ struct SrSSBuffer
 		}
 	}
 
-	T get_data(int x,int y)
+	T get_data(int x,int y) const
 	{
 		int index = y*w + x;
 		if (index < _buffer.size())

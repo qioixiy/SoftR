@@ -4,6 +4,8 @@
 #include "..\\Uitilities.h"
 #include "..\\RBMath\\Inc\Colorf.h"
 #include "..\\Logger.h"
+#include "InnerData.h"
+#include "../RBMath/Inc/Color32.h"
 
 class SrTexture2D
 {
@@ -30,6 +32,41 @@ public:
 		return ret;
 	}
 
+	static SrTexture2D* creat(const SrSSBuffer<RBColor32>& ssbuffer)
+	{
+		SrTexture2D* ret = new SrTexture2D();
+		
+		ret->_w = ssbuffer.w; ret->_h = ssbuffer.h;
+		ret->_size = ssbuffer.size*4;
+		ret->_data = new unsigned char[ret->_size];
+		for (int i = 0; i < ret->_h; ++i)
+		{
+			for (int j = 0; j < ret->_w; ++j)
+			{
+				ret->set_color(j, i, RBColorf(ssbuffer.get_data(j, i)));
+			}
+		}
+		return ret;
+	}
+
+	void set_color(int x, int y,const RBColorf& c) const
+	{
+		int index = y*_w * 4 + x * 4;
+		if (index < _size)
+		{
+			_data[index] = c.r;
+			_data[index+1] = c.g;
+			_data[index+2] = c.b;
+			_data[index+3] = c.a;
+
+		}
+		else
+		{
+
+		}
+
+	}
+
 	RBColorf get_color(int x,int y) const
 	{
 		int index = y*_w*4 + x*4;
@@ -43,7 +80,10 @@ public:
 			return c;
 		}
 		else
-			g_logger->debug_log(WIP_WARNING, "Texture %d :Index out of texture 2d:%d/%d！！x:%d/%d::y:%d/%d",this, index,_size,x,_w,y,_h);
+		{
+			g_logger->debug_log(WIP_WARNING, "Texture %d :Index out of texture 2d:%d/%d！！x:%d/%d::y:%d/%d", this, index, _size, x, _w, y, _h);
+			return RBColorf::blank;
+		}
 		
 	}
 

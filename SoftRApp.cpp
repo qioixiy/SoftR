@@ -23,6 +23,43 @@ SoftRApp::SoftRApp(HINSTANCE hInstance)
 {
 	RemoteryDebug::get_remotery();
 	_index = 0;
+
+
+	cam = nullptr;
+	cam_d3d = nullptr;
+
+
+	out_tex = nullptr;
+
+	ef = nullptr;
+
+
+	obj = nullptr;
+	obj1 = nullptr;
+	obj2 = nullptr;
+	obj_man = nullptr;
+	obj_floor_down = nullptr;
+	obj_wolf = nullptr;
+	obj_sky = nullptr;
+
+
+	pip = nullptr;
+	ps = nullptr;
+	vs = nullptr;
+	bf = nullptr;
+	tf = nullptr;
+	tf1 = nullptr;
+	tf2 = nullptr;
+	tf_man = nullptr;
+	tf_wolf = nullptr;
+	tf_floor_down = nullptr;
+	tf_sky = nullptr;
+
+
+	mb = nullptr;
+
+	
+
 }
 #include "Logger.h"
 SoftRApp::~SoftRApp()
@@ -44,7 +81,7 @@ bool SoftRApp::_init_platform()
 
 	cam_d3d = new RBCamera();
 	if (!cam_d3d) return false;
-	cam_d3d->set_position(0, 0, -15);
+	cam_d3d->set_position(0, 0, -25);
 	cam_d3d->set_target(RBVector4(0, 0, 0));
 	cam_d3d->set_fov_y(45);
 	cam_d3d->set_ratio(16.f / 9.f);
@@ -75,10 +112,11 @@ bool SoftRApp::_init_softr()
 	cam->set_target(position);
 	cam->set_fov_y(60);
 	cam->set_ratio(16.f / 9.f);
-	cam->set_near_panel(1.f);
+	cam_np = 1.0;
+	cam->set_near_panel(cam_np);
 	cam->set_far_panel(2000.f);
 
-	set_cam_move_speed(5, 5);
+	set_cam_move_speed(15, 15);
 	set_cam_rotate_speed(1, 1);
 
 	pip = new SrPipeline();
@@ -87,26 +125,51 @@ bool SoftRApp::_init_softr()
 	obj = RBObject::create_object();
 	if (!obj) return false;
 	//用于做oit的模型
-	obj->load_mesh("Res/cube.obj");
+	obj->load_mesh("Res/house.obj");
 	//obj->load_mesh("objs/tri.obj");
 	obj->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
 	obj->_node->set_position(0, -1, 120);
-	obj->_node->rotate(-30, 195, 0);
+	//obj->_node->rotate(-30, 195, 0);
 
 	obj1 = RBObject::create_object();
 	if (!obj1) return false;
-	obj1->load_mesh("Res/0001.obj");
+	obj1->load_mesh("Res/tree.obj");
 	obj1->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
-	obj1->_node->set_position(5, -1, 200);
-	obj1->_node->rotate(-30, 195, 0);
+	obj1->_node->set_position(0, -1, 120);
+	//obj1->_node->rotate(-30, 195, 0);
 
 	obj2 = RBObject::create_object();
 	if (!obj2) return false;
-	obj2->load_mesh("Res/man.obj");
+	obj2->load_mesh("Res/floor.obj");
 	obj2->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
-	obj2->_node->set_position(-10, -1, 120);
-	obj2->_node->rotate(-10, 230, 0);
+	obj2->_node->set_position(0, -1, 120);
+	//obj2->_node->rotate(-10, 230, 0);
 
+	obj_man = RBObject::create_object();
+	if (!obj_man) return false;
+	obj_man->load_mesh("Res/sw.obj");
+	obj_man->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj_man->_node->set_position(0, -1, 120);
+
+	obj_floor_down = RBObject::create_object();
+	if (!obj_floor_down) return false;
+	obj_floor_down->load_mesh("Res/floor_down.obj");
+	//obj_floor_down->load_mesh("Res/simple.obj");
+	obj_floor_down->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj_floor_down->_node->set_position(0, -1, 120);
+
+
+	obj_wolf = RBObject::create_object();
+	if (!obj_wolf) return false;
+	obj_wolf->load_mesh("Res/wolf.obj");
+	obj_wolf->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj_wolf->_node->set_position(0, -1, 120);
+
+	obj_sky = RBObject::create_object();
+	if (!obj_sky) return false;
+	obj_sky->load_mesh("Res/sky.obj");
+	obj_sky->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj_sky->_node->set_position(0, -1, 120);
 
 	g_logger->debug_print("Total surface: %d", obj2->get_index_count() / 3);
 	g_logger->debug_print("Total surface: %d", obj->get_index_count() / 3);
@@ -125,7 +188,19 @@ bool SoftRApp::_init_softr()
 	bf = new SrBufferConstant();
 	bf->init(mb, sizeof(ShaderMatrixBuffer));
 
-	tf = SrTexture2D::creat("Res/man.png");
+	
+	tf = SrTexture2D::creat("Res/house.jpg");
+	tf1 = SrTexture2D::creat("Res/tree.jpg");
+	
+	tf2 = SrTexture2D::creat("Res/floor.jpg");
+	
+	tf_man = SrTexture2D::creat("Res/sw.jpg");
+	tf_wolf = SrTexture2D::creat("Res/wolf.jpg");
+	
+	tf_floor_down = SrTexture2D::creat("Res/floor_grass.jpg");
+	
+	tf_sky = SrTexture2D::creat("Res/skybox1.jpg");
+	
 
 	/*
 	vs->set_constant_buffer("matrix", bf);
@@ -141,6 +216,8 @@ bool SoftRApp::_init_softr()
 
 	RBlog("现在运行的是SoftRApp!!!\n");
 	g_logger->debug_log(WIP_WARNING, "现在运行的是SoftRApp!!!");
+
+	back_color_buffer = new SrSSBuffer<RBColor32>(*pip->get_back_color_buffer());
 
 	return ret;
 }
@@ -179,7 +256,7 @@ void SoftRApp::Termination()
 	*/
 	
 
-
+	delete back_color_buffer;
 	delete ps;
 	delete vs;
 	delete mb;
@@ -231,6 +308,11 @@ void SoftRApp::handle_input(float dt)
 		g_logger->debug_print("change to thread %d\n", (_index-1) % i -1);
 	}
 
+	if (Input::get_key_down(WIP_N))
+	{
+		cam_np += 1;
+		cam->set_near_panel(cam_np);
+	}
 
 	int x = Input::get_mouse_x();
 	int y = Input::get_mouse_y();
@@ -269,31 +351,55 @@ void SoftRApp::UpdateScene(float dt)
 {
 
 	//obj->_node->translate(0,dt,0);
-	obj2->_node->rotate(0,10*dt,0);
-	obj->_node->rotate(10*dt, 10 * dt, 0);
-	obj1->_node->rotate(0, 10 * dt, 5*dt);
+	//obj2->_node->rotate(0,10*dt,0);
+	//obj->_node->rotate(10*dt, 10 * dt, 0);
+	//obj1->_node->rotate(0, 10 * dt, 5*dt);
 	//obj->_node->rotate(0,10*dt,0);
 	//RBVector3 tar = RBVector3(0, 0, 0);
 	//cam->pan(tar,100*dt);
 	//cam->rotate(0,0.1,0);
 
 	handle_input(dt);
-
-	obj1->_node->get_mat(mb->m);
 	cam->get_view_matrix(mb->v);
 	cam->get_perspective_matrix(mb->p);
+	obj1->_node->get_mat(mb->m);
+	ps->set_texture_index(0, tf1);
 	pip->draw(*obj1->get_softr_vertex_buffer(), *obj1->get_softr_index_buffer(), obj1->get_index_count() / 3);
 
 	obj->_node->get_mat(mb->m);
-	cam->get_view_matrix(mb->v);
-	cam->get_perspective_matrix(mb->p);
+	ps->set_texture_index(0, tf);
+
+
 	pip->draw(*obj->get_softr_vertex_buffer(), *obj->get_softr_index_buffer(), obj->get_index_count() / 3);
 
 	obj2->_node->get_mat(mb->m);
-	cam->get_view_matrix(mb->v);
-	cam->get_perspective_matrix(mb->p);
+	ps->set_texture_index(0, tf2);
+
+
 	pip->draw(*obj2->get_softr_vertex_buffer(), *obj2->get_softr_index_buffer(), obj2->get_index_count() / 3);
 
+	obj_man->_node->get_mat(mb->m);
+	ps->set_texture_index(0, tf_man);
+	pip->draw(*obj_man->get_softr_vertex_buffer(), *obj_man->get_softr_index_buffer(), obj_man->get_index_count() / 3);
+
+	
+	obj_floor_down->_node->get_mat(mb->m);
+	ps->set_texture_index(0, tf_floor_down);
+	pip->draw(*obj_floor_down->get_softr_vertex_buffer(), *obj_floor_down->get_softr_index_buffer(), obj_floor_down->get_index_count() / 3);
+
+	obj_wolf->_node->get_mat(mb->m);
+	ps->set_texture_index(0, tf_wolf);
+	pip->draw(*obj_wolf->get_softr_vertex_buffer(), *obj_wolf->get_softr_index_buffer(), obj_wolf->get_index_count() / 3);
+	
+	obj_sky->_node->rotate(0, 2.5, 0);
+	obj_sky->_node->get_mat(mb->m);
+	ps->set_texture_index(0, tf_sky);
+	pip->draw(*obj_sky->get_softr_vertex_buffer(), *obj_sky->get_softr_index_buffer(), obj_sky->get_index_count() / 3);
+	
+	//back_color_buffer->clone(*pip->get_back_color_buffer());
+	//auto* k = SrTexture2D::creat(*back_color_buffer);
+
+	pip->swap();
 	pip->clear();
 	
 }

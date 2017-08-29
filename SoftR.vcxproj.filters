@@ -279,6 +279,9 @@
     <ClCompile Include="Debug.cpp">
       <Filter>Uti\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="SoftR\SimGPU_new.cpp">
+      <Filter>SoftRWrap\SimGPU</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -562,6 +565,12 @@
     </ClInclude>
     <ClInclude Include="Debug.h">
       <Filter>Uti\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\SimGPU_new.h">
+      <Filter>SoftRWrap\SimGPU</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftR\ThreadPool.h">
+      <Filter>SoftRWrap\SimGPU</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

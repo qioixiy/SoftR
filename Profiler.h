@@ -80,7 +80,7 @@ public:
 		_gather_element_ex.clear();
 	}
 
-	//循环多少次输出一次
+	//how many times to output
 	void set_output_inter(int times)
 	{
 		_times = times;

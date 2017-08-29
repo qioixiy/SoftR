@@ -58,6 +58,10 @@ public:
 	inline void clear_total() { _total_frag = 0; }
 	inline int get_total() { return _total_frag; }
 	inline void set_last_ts_time(float t) { _last_ts_time = t; }
+	//setup任意三角形（直接2）
+
+	void new_set_tri2(SrTriangle* tri, SrStagePS* _stage_ps,SrStageOM* _stage_om);
+	bool new_scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrStagePS* _stage_ps,SrStageOM* _stage_om);
 private:
 	SrStagePS* _stage_ps;
 	SrStageOM* _stage_om;
@@ -80,6 +84,7 @@ private:
 	void _set_bottom_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments);
 	//setup任意三角形（直接）
 	void _new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments);
+
 	//setup任意三角形（直接2）
 	void _new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments);
 
@@ -104,5 +109,9 @@ private:
 	SrSimGPU* _gpu;
 
 	int _total_frag;
+
+	bool _discard_invisible(const VertexP3N3T2& data);
+
+	bool sss;
 };
 

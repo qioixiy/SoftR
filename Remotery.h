@@ -263,7 +263,7 @@ typedef enum rmtError
 ------------------------------------------------------------------------------------------------------------------------
 */
 
-
+#ifdef USE_RMT
 
 // Can call remotery functions on a null pointer
 // TODO: Can embed extern "C" in these macros?
@@ -300,7 +300,18 @@ typedef enum rmtError
 
 #define rmt_EndCPUSample()                                                          \
     RMT_OPTIONAL(RMT_ENABLED, _rmt_EndCPUSample())
-
+#else
+#define rmt_Settings()                                                              
+#define rmt_CreateGlobalInstance(rmt)                                               
+#define rmt_DestroyGlobalInstance(rmt)                                              
+#define rmt_SetGlobalInstance(rmt)                                                 
+#define rmt_GetGlobalInstance()                                                     
+#define rmt_SetCurrentThreadName(rmt)                                               
+#define rmt_LogText(text)                                                          
+#define rmt_BeginCPUSample(name)                                                   
+#define rmt_BeginCPUSampleDynamic(namestr)                                         
+#define rmt_EndCPUSample()                                                          
+#endif
 
 // Callback function pointer types
 typedef void* (*rmtMallocPtr)(void* mm_context, rmtU32 size);

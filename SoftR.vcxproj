@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -43,16 +43,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>F:\DXSDK_Jun10\DXSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\DXSDK_Jun10\DXSDK\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>I:\DXSDK_Jun10\DXSDK\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>I:\DXSDK_Jun10\DXSDK\Lib\x86;$(LibraryPath)</LibraryPath>
     <TargetName>softr</TargetName>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>F:\DXSDK_Jun10\DXSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\DXSDK_Jun10\DXSDK\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>I:\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>I:\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -83,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -148,6 +148,7 @@
     <ClCompile Include="SoftR\ShaderPixel.cpp" />
     <ClCompile Include="SoftR\ShaderVertex.cpp" />
     <ClCompile Include="SoftR\SimGPU.cpp" />
+    <ClCompile Include="SoftR\SimGPU_new.cpp" />
     <ClCompile Include="SoftR\StageBase.cpp" />
     <ClCompile Include="SoftR\StageGS.cpp" />
     <ClCompile Include="SoftR\StageIA.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="SoftR\ShaderPixel.h" />
     <ClInclude Include="SoftR\ShaderVertex.h" />
     <ClInclude Include="SoftR\SimGPU.h" />
+    <ClInclude Include="SoftR\SimGPU_new.h" />
     <ClInclude Include="SoftR\StageBase.h" />
     <ClInclude Include="SoftR\StageGS.h" />
     <ClInclude Include="SoftR\StageIA.h" />
@@ -253,6 +255,7 @@
     <ClInclude Include="SoftR\Texture2D.h" />
     <ClInclude Include="SoftR\Texture3D.h" />
     <ClInclude Include="SoftR\TextureBase.h" />
+    <ClInclude Include="SoftR\ThreadPool.h" />
     <ClInclude Include="SoftR\VertexFormat.h" />
     <ClInclude Include="SoftR\ViewBase.h" />
     <ClInclude Include="SoftR\ViewRenderTarget.h" />

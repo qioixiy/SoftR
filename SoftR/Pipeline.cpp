@@ -71,10 +71,10 @@ void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex 
 	//_rasterizer->shade(_triangles_fragments);
 	//_triangles_fragments:px.position.w = c.a;px.normal.x = c.r;px.normal.y = c.g;px.normal.z = c.b;
 	//_rasterizer->merge(_triangles_fragments,_color_buffer,_depth_buffer);
-	_profler.out_put_after_time(20);
+	//_profler.out_put_after_time(20);
 	_rasterizer->set_last_ts_time(_profler.get_time());
 
-	_show_buffer(_bfidx,_out_tex);
+	
 
 	_clear();
 
@@ -90,11 +90,47 @@ void SrPipeline::draw(const SrBufferVertex & vertex_buffer, const SrBufferIndex 
 	s1.clear_write_num();
 	_rasterizer->clear_total();
 }
-
+float lum(const RBColorf& c)
+{
+	return c.r*0.299 + 0.587*c.g + c.b*0.114;
+}
 void SrPipeline::_show_buffer(int index,RBD3D11Texture2D* out_tex)
 {
-	if(index==0)
-		out_tex->write_data(reinterpret_cast<RBColor32*>(&_color_buffer.get_buffer()[0]), _rasterizer->get_width(), _rasterizer->get_height());
+	if (index == 0)
+	{
+		for (int i = 0; i < _color_buffer.h; ++i)
+		{
+			for (int j = 0; j < _color_buffer.w; ++j)
+			{
+				RBColorf bc =  _color_buffer.get_data(j, i);
+				RBColorf color = bc;
+				float sample_n = 100;
+				float f = float(1) / float(sample_n);
+				RBVector2 d = (RBVector2(0.5, 0.5) - RBVector2(j,i))*f;
+				RBVector2 c = RBVector2(j, i);
+				for (int i = 0; i<sample_n; ++i)
+				{
+					RBColorf sc = _color_buffer.get_data(c.x, c.y);
+					if (lum(sc)>0.8)
+						color = color + sc;
+
+					c += d;
+				}
+				color *= f;
+
+				color = color*0.7f + bc;
+				RBColor32 rc;
+				color.clamp_to_0_1();
+				rc.r = color.r * 255;
+				rc.g = color.g * 255;
+				rc.b = color.b * 255;
+				//rc.a = color.a * 255;
+
+				_color_buffers[0]->set_data(j, i, rc);
+			}
+		}
+		out_tex->write_data(reinterpret_cast<RBColor32*>(&_color_buffers[0]->get_buffer()[0]), _rasterizer->get_width(), _rasterizer->get_height());
+	}
 	else
 		out_tex->write_data(reinterpret_cast<RBColor32*>(&_color_buffers[index-1]->get_buffer()[0]), _rasterizer->get_width(), _rasterizer->get_height());
 }
@@ -118,7 +154,7 @@ SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 	_bfidx = 0;
 	/*
 	for(int i=0;i<102400;++i)
-	{3124
+	{
 		_triangles.push_back(new SrTriangle(VertexP3N3T2(),VertexP3N3T2(),VertexP3N3T2()));
 	}
 	*/
@@ -192,6 +228,11 @@ SrPipeline::~SrPipeline()
 #ifndef POOL
 	SrTriangle::Deinit();
 #endif
+}
+
+void SrPipeline::swap(f32 frame)
+{
+	_show_buffer(_bfidx, _out_tex);
 }
 
 void SrPipeline::_clear()

@@ -5,9 +5,9 @@
 
 
 //内存对齐：byte对齐
-#define BYTEALIGN (int)8
+#define BYTEALIGN (size_t)8
 //强制对齐
-#define ALIGNUP(naddress,nbytes) ((((uint)naddress)+\
+#define ALIGNUP(naddress,nbytes) ((((size_t)naddress)+\
 	(nbytes)-1 ) & (~((nbytes)-1)))
 
 typedef bool MPOS;

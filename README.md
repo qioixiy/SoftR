@@ -145,6 +145,7 @@ MSAA**等）
 -   更多的纹理采样方案
 -   OIT
 -   新的光栅化/并行架构
+-   API D3D12化
 
 Rencetly Update
 =========

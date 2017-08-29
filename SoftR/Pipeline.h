@@ -33,9 +33,10 @@ public:
 	//inner use
 	void set_out_tex(RBD3D11Texture2D* out_tex)
 	{
+
 		_out_tex = out_tex;
 	}
-	  
+	void swap(f32 frame = 60);
 	void clear()
 	{
 		//批量修改内存，下列函数非常耗时
@@ -43,7 +44,10 @@ public:
 		//_depth_buffer.set_vals(1.1f);
 		_clear_SSBuffer();
 	}
-
+	SrSSBuffer<RBColor32>* get_back_color_buffer()
+	{
+		return &_color_buffer;
+	}
 private:
 
 	Profiler _profler;
