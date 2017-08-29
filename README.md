@@ -199,5 +199,6 @@ Rendering results
 ![](https://github.com/wubugui/FXXKTracer/raw/master/pic/19-45-26.jpg)
 ![](https://github.com/wubugui/FXXKTracer/raw/master/pic/15-51-03.jpg)
 ![](https://github.com/wubugui/FXXKTracer/raw/master/pic/QQ%E5%9B%BE%E7%89%8720161123215229.png)
+![](https://github.com/wubugui/FXXKTracer/raw/master/pic/softr1.png)
 
 实现笔记：[http://claireswallet.farbox.com/post/graphics/guang-zha-hua-xuan-ran-qi](http://claireswallet.farbox.com/post/graphics/guang-zha-hua-xuan-ran-qi)
