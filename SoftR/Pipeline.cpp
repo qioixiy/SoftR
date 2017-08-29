@@ -148,7 +148,7 @@ void SrPipeline::_clear_SSBuffer()
 	}
 }
 
-#define MAX_QUEUE_SIZE 10240000
+#define MAX_QUEUE_SIZE 10240000/4
 SrPipeline::SrPipeline():s1(MAX_QUEUE_SIZE)
 {
 	_bfidx = 0;

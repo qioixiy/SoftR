@@ -133,10 +133,11 @@ Note
 Rencently TODO
 =========
 
--   **完善基本的管线，按照标准的现代管线完善，clipping space，clipping等等**
+-	**实用性改善！** ：**等价的并行架构，可以用于在CPU上等价模拟DirectCompute计算。**
+-   **完善基本的管线，按照标准的现代管线完善，clipping space，clipping等等，标准API**
 -   完善帧率太低就直接discard，并且记录下来的功能（这个功能当前是在fragment里面做的，效果还不是很好）
 -   各个部件的线程安全测试和修复
--   SIMD加速
+-   SIMD加速，单独编译的Shader
 -   CommandQueue
 -   新的或者完整的并行模式
 -   Blending
@@ -167,7 +168,10 @@ Rencetly Update
 -	更新了多线程，使用信号量进行同步。
 
 **2016/3/15**
--	添加了Remotery来Profile。运来的Profile依然在工作。
+-	添加了Remotery来Profile。原来的Profile依然在工作。
+
+**2016/11/10**
+-	注释了Profile输出，改回了Release模式编译，将原本的双线程变成了四线程。
 
 
 Platform Dependences
@@ -192,5 +196,8 @@ D3D11需要包含的库：
 
 Rendering results
 ========
+![](https://github.com/wubugui/FXXKTracer/raw/master/pic/19-45-26.jpg)
+![](https://github.com/wubugui/FXXKTracer/raw/master/pic/15-51-03.jpg)
+![](https://github.com/wubugui/FXXKTracer/raw/master/pic/QQ%E5%9B%BE%E7%89%8720161123215229.png)
 
-渲染图样及其文档：[http://claireswallet.farbox.com/post/graphics/guang-zha-hua-xuan-ran-qi](http://claireswallet.farbox.com/post/graphics/guang-zha-hua-xuan-ran-qi)
+实现笔记：[http://claireswallet.farbox.com/post/graphics/guang-zha-hua-xuan-ran-qi](http://claireswallet.farbox.com/post/graphics/guang-zha-hua-xuan-ran-qi)

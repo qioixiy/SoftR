@@ -17,8 +17,13 @@
 保序问题，透明物体渲染http://zhuanlan.zhihu.com/sildenafil/20180902
 http ://graphics.cs.cmu.edu/courses/15869/fall2014/article/1
 */
+<<<<<<< HEAD
 const int thread_num = 1;
 //#define TRI
+=======
+const int thread_num = 4;
+
+>>>>>>> e23b7ce55eedc98e00e9c0ddc27461be9ae87376
 void func();
 class SrSimGPU
 {

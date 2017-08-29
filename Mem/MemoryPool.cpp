@@ -59,7 +59,7 @@ void* RBPoolAllctor::alloc(void** header, size_t single_size)
 
 void RBPoolAllctor::free(void** header, void *p, size_t single_size)
 {
-	//É¾µôÖ®ºóÒª·ÀÖ¹p±»·Ç·¨Ê¹ÓÃ
+	//åˆ æ‰ä¹‹åè¦é˜²æ­¢pè¢«éæ³•ä½¿ç”¨
 	NEXT_NODE(p) = *header;
 	*header = p;
 
