@@ -12,22 +12,15 @@ struct MemoryPoolNode
 };
 */
 
-<<<<<<< HEAD
 //TODO:ÄÚ´æ´æ·ÅÎ»ÖÃµÄµ÷ÕûÊ¹µÃ³ÌÐò²»ÄÇÃ´±ðÅ¤
-=======
-//TODO:å†…å­˜å­˜æ”¾ä½ç½®çš„è°ƒæ•´ä½¿å¾—ç¨‹åºä¸é‚£ä¹ˆåˆ«æ‰­
->>>>>>> e23b7ce55eedc98e00e9c0ddc27461be9ae87376
 #define REPORT
 
 
 #define NEXT_NODE(p) *(void**)((size_t)p+single_size)
 
 #define NEW_NODE(single_size) (void*)(((size_t)allocate_aligned(sizeof(void*)+single_size)))
-<<<<<<< HEAD
+
 //Õâ¸ö²ÎÊý¿ØÖÆµ¥´ÎmallocÄÚ´æµÄ´óÐ¡
-=======
-//è¿™ä¸ªå‚æ•°æŽ§åˆ¶å•æ¬¡mallocå†…å­˜çš„å¤§å°
->>>>>>> e23b7ce55eedc98e00e9c0ddc27461be9ae87376
 const int g_pool_expand_node_number = 1024;
 class RBPoolAllctor
 {
@@ -53,11 +46,7 @@ public:
 	void new_pool(void** header, size_t single_size);
 	void * alloc(void** header, size_t single_size);
 	void free(void** header, void *p);
-<<<<<<< HEAD
 	//TODO:ÐèÒªÔÚÉ¾³ýÖ®ºó½ûÖ¹ÓÃ»§ÔÙ´ÎÊ¹ÓÃpÖ¸Õë.
-=======
-	//TODO:éœ€è¦åœ¨åˆ é™¤ä¹‹åŽç¦æ­¢ç”¨æˆ·å†æ¬¡ä½¿ç”¨pæŒ‡é’ˆ.
->>>>>>> e23b7ce55eedc98e00e9c0ddc27461be9ae87376
 	void free(void** header, void *p, size_t single_size);
 	INI_RESULT shutdown();
 
@@ -76,11 +65,7 @@ public:
 		}
 	}
 
-<<<<<<< HEAD
 	//±¨¸æÄÚ´æÊ¹ÓÃÇé¿ö
-=======
-	//æŠ¥å‘Šå†…å­˜ä½¿ç”¨æƒ…å†µ
->>>>>>> e23b7ce55eedc98e00e9c0ddc27461be9ae87376
 	void report(void* header, size_t single_size)
 	{
 #ifdef REPORT

@@ -96,6 +96,8 @@ float lum(const RBColorf& c)
 }
 void SrPipeline::_show_buffer(int index,RBD3D11Texture2D* out_tex)
 {
+	out_tex->write_data(reinterpret_cast<RBColor32*>(&_color_buffer.get_buffer()[0]), _rasterizer->get_width(), _rasterizer->get_height());
+	return;
 	if (index == 0)
 	{
 		for (int i = 0; i < _color_buffer.h; ++i)

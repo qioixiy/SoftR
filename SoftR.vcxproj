@@ -51,13 +51,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-<<<<<<< HEAD
     <IncludePath>I:\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
     <LibraryPath>I:\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
-=======
-    <IncludePath>D:\DXSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\DXSDK\Lib\x86;$(LibraryPath)</LibraryPath>
->>>>>>> e23b7ce55eedc98e00e9c0ddc27461be9ae87376
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
