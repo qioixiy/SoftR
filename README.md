@@ -136,7 +136,7 @@ Rencently TODO
 -   效率优化，线扫方法，神庙全纹理，基本着色器，起码20fps!参考[https://github.com/gameknife/SoftRenderer](https://github.com/gameknife/SoftRenderer)
 -   整理重构！
 
-Future TODE
+Future works
 =========
 
 -	**实用性改善！** ：**等价的并行架构，可以用于在CPU上等价模拟DirectCompute计算。**
