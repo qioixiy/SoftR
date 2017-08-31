@@ -171,6 +171,12 @@ bool SoftRApp::_init_softr()
 	obj_sky->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
 	obj_sky->_node->set_position(0, -1, 120);
 
+	obj_surround = RBObject::create_object();
+	if (!obj_surround) return false;
+	obj_surround->load_mesh("Res/sp.obj");
+	obj_surround->generate_softr_buffer<VertexFormats::Vertex_PCNT>();
+	obj_surround->_node->set_position(0, -1, 120);
+
 	g_logger->debug_print("Total surface: %d", obj2->get_index_count() / 3);
 	g_logger->debug_print("Total surface: %d", obj->get_index_count() / 3);
 	g_logger->debug_print("Total surface: %d", obj1->get_index_count() / 3);
@@ -331,7 +337,7 @@ void SoftRApp::handle_input(float dt)
 	old_y = y;
 
 	//cam->rotate(-mouse_m.y*dt*_cam_rotate_speed.y, -mouse_m.x*dt*_cam_rotate_speed.x,0);
-	float val = mouse_m.y*_cam_rotate_speed.y / (dt*1000.f);
+	float val = mouse_m.y*_cam_rotate_speed.y / (dt*100.f);
 
 
 	RBVector3 down = RBVector3(0, -1, 0);
@@ -343,7 +349,7 @@ void SoftRApp::handle_input(float dt)
 	{
 		cam->rotate_by_axis(-val, cam->get_right());
 	}
-	cam->rotate_by_axis(mouse_m.x*_cam_rotate_speed.x / (dt*1000.f), cam->get_up());
+	cam->rotate_by_axis(mouse_m.x*_cam_rotate_speed.x / (dt*100.f), cam->get_up());
 
 }
 
@@ -395,6 +401,10 @@ void SoftRApp::UpdateScene(float dt)
 	obj_sky->_node->get_mat(mb->m);
 	ps->set_texture_index(0, tf_sky);
 	pip->draw(*obj_sky->get_softr_vertex_buffer(), *obj_sky->get_softr_index_buffer(), obj_sky->get_index_count() / 3);
+	
+	obj_surround->_node->get_mat(mb->m);
+	ps->set_texture_index(0, tf_sky);
+	pip->draw(*obj_surround->get_softr_vertex_buffer(), *obj_surround->get_softr_index_buffer(), obj_surround->get_index_count() / 3);
 	
 	//back_color_buffer->clone(*pip->get_back_color_buffer());
 	//auto* k = SrTexture2D::creat(*back_color_buffer);

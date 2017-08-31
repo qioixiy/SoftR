@@ -4,8 +4,15 @@
 
 
 //#include "RBBasedata.h"
-#include "IMemory.h"
+#include "..\\RBMath\\Inc\\Platform\\RBBasedata.h"
+#include <string>
 
+typedef bool MPOS;
+//内存对齐：byte对齐
+#define BYTEALIGN (size_t)8
+//强制对齐
+#define ALIGNUP(naddress,nbytes) ((((size_t)naddress)+\
+	(nbytes)-1 ) & (~((nbytes)-1)))
 
 struct MemoryFrame
 {
@@ -16,19 +23,39 @@ struct MemoryFrame
 class RBFrameAlloctor
 {
 public:
-	INI_RESULT init(size_t tsize);
+	RBFrameAlloctor()
+	{
+		_byte_alignment = 8;;
+		_pmemory = nullptr;
+		_pbase = nullptr;
+		_pcap = nullptr;
+		_pframe_base = nullptr;
+		_pframe_cap = nullptr;
+		_all_memory = 0;
 
-	void* alloc(size_t tsize,MPOS tpos);
+		tag = "";
+	}
+	INI_RESULT init(size_t tsize, const char* tag);
+
+	void* alloc(size_t tsize, MPOS tpos);
 	INI_RESULT shutdown();
-	void getframe(MemoryFrame& mf,MPOS tpos);
+	void getframe(MemoryFrame& mf, MPOS tpos);
 	void release(MemoryFrame& mf);
 	//++帧释放函数
 
 	size_t get_all_memory();
 	size_t get_allocated_memory();
 	size_t get_remain_memory();
+
+	void serialize(const char* filename, MPOS tpos);
+	void* deserialize(const char* filename, MPOS tpos);
+	size_t get_alloc_size(size_t osize)
+	{
+		return ALIGNUP(osize, _byte_alignment);
+	}
+
 private:
-	void* alloc(size_t tsize){return 0;}
+	void* alloc(size_t tsize) { return 0; }
 
 
 	int _byte_alignment;
@@ -38,17 +65,12 @@ private:
 	u8* _pframe_base;
 	u8* _pframe_cap;
 	size_t _all_memory;
+
+	std::string tag;
 };
-
-
-//RBFrameAlloctor *GFrameAlloctor;
-
-class RBSystemAlloctorSub
+struct ThreadMem
 {
-
-public:
-	RBSystemAlloctorSub(){}
-	//void *operator new(size_t tsize){int* p = new int;printf("你正在使用子类的新建！");return (void*)&p;}
+	MemoryFrame mf;
+	RBFrameAlloctor frame;
 };
-
 #endif

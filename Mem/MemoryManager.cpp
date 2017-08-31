@@ -39,16 +39,12 @@ RBFrameAlloctor* RBMemoryManager::get_frameallocator()
 
 INI_RESULT RBMemoryManager::StartUp()
 {
-	RBFN(RBMemoryManager::StartUp);
-	if(!_memorymanager->_frame_allocator->init(frame_memory)) 
-		return INI_FAIL;
+
 	return INI_SUCCESS;
 }
 
 INI_RESULT RBMemoryManager::ShutDown()
 {
-	RBFN(RBMemoryManager::ShutDown);
-	if(!_memorymanager->_frame_allocator->shutdown()) 
-		return INI_FAIL;
+
 	return INI_SUCCESS;
 }

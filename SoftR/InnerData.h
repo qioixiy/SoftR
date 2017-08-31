@@ -22,6 +22,11 @@ struct SrTriangle
 		v[2] = v3;
 	}
 
+	~SrTriangle()
+	{
+		printf("tr de!\n");
+	}
+
 	static void* operator new(size_t size)
 	{
 
@@ -59,7 +64,7 @@ struct SrTriangle
 
 		frame = new RBFrameAlloctor();
 		//20M
-		frame->init((1 << 20)*20);
+		frame->init((1 << 20)*200,"Triangles");
 		frame->getframe(me, false);
 #endif
 		return true;

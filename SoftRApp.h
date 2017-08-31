@@ -78,6 +78,8 @@ protected:
 	RBObject* obj_floor_down;
 	RBObject* obj_wolf;
 	RBObject* obj_sky;
+	RBObject* obj_surround;
+
 
 
 	SrPipeline* pip;

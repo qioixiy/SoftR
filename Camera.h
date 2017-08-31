@@ -2,8 +2,8 @@
 #pragma warning(disable : 4005)
 
 
-#define RW 1280
-#define  RH 720
+#define RW 800
+#define  RH 600
 #include "RBMath/Inc/Vector3.h"
 class RBCamera
 {

@@ -53,7 +53,7 @@ RBPoolAllctor* ATEST::pool = nullptr;
 
 void c__main()
 {
-	RBMemoryManager::Instance()->get_frameallocator()->init(102400);
+	RBMemoryManager::Instance()->get_frameallocator()->init(102400,"");
 	ATEST::Init();
 
 	printf("%d\n",sizeof(ATEST));

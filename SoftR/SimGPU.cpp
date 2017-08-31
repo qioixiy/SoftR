@@ -2,11 +2,18 @@
 
 SrSimGPU* g_gpu = nullptr;// new SrSimGPU();
 
-void func()
+atomic_int SrSimGPU::handle_count = 0;
+
+ThreadMem *SrSimGPU::mem_list = nullptr;
+void SrSimGPU::mem_list_init()
 {
-	while(true)
-	g_logger->debug_print("sssssssssss\n");
+	mem_list = new ThreadMem();
+	SrSimGPU::mem_list->frame.init((1 << 20) * 200,"class SrSimGPU");
+	SrSimGPU::mem_list->frame.getframe(SrSimGPU::mem_list->mf, false);
 }
-//const int thread_num = 2;
-std::mutex SrSimGPU::mu;
-std::condition_variable SrSimGPU::g_pass_done;
+
+void SrSimGPU::mem_list_deinit()
+{
+	SrSimGPU::mem_list->frame.shutdown();
+	delete mem_list;
+}

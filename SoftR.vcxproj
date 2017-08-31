@@ -163,6 +163,7 @@
     <ClCompile Include="SoftR\ViewRenderTarget.cpp" />
     <ClCompile Include="SoftR\ViewShaderResource.cpp" />
     <ClCompile Include="SoftR\ViewUnorderAccess.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Win32SoftRKey.cpp" />
   </ItemGroup>
@@ -261,6 +262,7 @@
     <ClInclude Include="SoftR\ViewRenderTarget.h" />
     <ClInclude Include="SoftR\ViewShaderResouce.h" />
     <ClInclude Include="SoftR\ViewUnorderAccess.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Uitilities.h" />
     <ClInclude Include="VertexFormats.h" />
   </ItemGroup>

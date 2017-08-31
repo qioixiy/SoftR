@@ -60,6 +60,9 @@ public:
 	inline void set_last_ts_time(float t) { _last_ts_time = t; }
 	//setup任意三角形（直接2）
 
+	void trangle_setup_gpu(SrTriangle* tri,bool wireframe=false);
+
+
 	void new_set_tri2(SrTriangle* tri, SrStagePS* _stage_ps,SrStageOM* _stage_om);
 	bool new_scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev, SrStagePS* _stage_ps,SrStageOM* _stage_om);
 private:
@@ -86,7 +89,7 @@ private:
 	void _new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments);
 
 	//setup任意三角形（直接2）
-	void _new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments);
+	void _new_set_tri2(SrTriangle* tri);
 
 	//插值函数
 

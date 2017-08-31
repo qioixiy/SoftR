@@ -25,16 +25,14 @@ SrRasterizer::SrRasterizer(SrSimGPU * gpu)
 	_stage_ps = new SrStagePS();
 	_stage_om = new SrStageOM();
 
-	for (int i = 0; i < thread_num; ++i)
-	{
-		gpu->set_stage(i, _stage_ps, _stage_om);
-#ifdef TRI
-		gpu->set_raster(i,this);
-#endif
-	}
-	
+	gpu->set_stage_ps(_stage_ps);
+	gpu->set_stage_om(_stage_om);
+	gpu->set_raster(this);
+
 	_gpu = gpu;
 	_total_frag = 0;
+
+	sss = false;
 }
 
 SrRasterizer::~SrRasterizer()
@@ -314,25 +312,15 @@ void SrRasterizer::clip(std::vector<SrTriangle*> _triangles, std::vector<SrTrian
 
 void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vector<SrFragment*>& _triangles_fragments)
 {
+#define SIMGPU
+#ifdef SIMGPU
 #ifdef TRI
 	for (auto tri : _triangles)
 	{
-		//把坐标转换到视口
-		tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
-		tri->v[0].position.y = tri->v[0].position.y*0.5*_viewport_h;
-		tri->v[1].position.x = tri->v[1].position.x*0.5*_viewport_w;
-		tri->v[1].position.y = tri->v[1].position.y*0.5*_viewport_h;
-		tri->v[2].position.x = tri->v[2].position.x*0.5*_viewport_w;
-		tri->v[2].position.y = tri->v[2].position.y*0.5*_viewport_h;
-
-		//检测三角形是否退化为直线
-
-		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
-			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
-			continue;
-
-		_gpu->write_min(tri);
+		
+		_gpu->add_task(tri);
 	}
+#endif
 #else
 	if (Input::get_key_up(WIP_C))
 	{
@@ -342,7 +330,7 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 	for (auto tri : _triangles)
 	{
 		//#define DRAW_WIREFRAME
-		if (false)
+		if (sss)
 		{
 			//把坐标转换到视口
 			tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
@@ -399,11 +387,11 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 						v.position.x = cy;
 						v.position.y = cx;
 						v.normal = a.normal;
-#ifndef TRI
 						if (_discard_invisible(v))
-							_gpu->write_min(v);
-#endif
-
+						{
+							_stage_ps->proccess(v);
+							_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+						}
 						cx += ix;
 						++i;
 					}
@@ -427,10 +415,11 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 						v.position.x = cx;
 						v.position.y = cy;
 						v.normal = a.normal;
-#ifndef TRI
 						if (_discard_invisible(v))
-							_gpu->write_min(v);
-#endif
+						{
+							_stage_ps->proccess(v);
+							_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+						}
 						cx += ix;
 						++i;
 					}
@@ -442,40 +431,49 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 			draw_line(tri->v[2], tri->v[0]);
 
 
-#ifndef TRI
 			for (int i = 0; i < 3; ++i)
 			{
 				VertexP3N3T2 &vr = tri->v[i];
 				VertexP3N3T2 v = vr;
 				v.position.x += 1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				v = vr;
 				v.position.x -= 1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				v = vr;
 				v.position.y += 1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				v = vr;
 				v.position.y -= 1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				v = vr;
 				v.position.x += 1;
 				v.position.y += 1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 
 
@@ -483,29 +481,36 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 				v.position.x += -1;
 				v.position.y += -1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				v = vr;
 				v.position.x += -1;
 				v.position.y += 1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				v = vr;
 				v.position.x += 1;
 				v.position.y += -1;
 				if (_discard_invisible(v))
-
-					_gpu->write_min(v);
+				{
+					_stage_ps->proccess(v);
+					_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+				}
 
 				if (_discard_invisible(vr))
-
-					_gpu->write_min(vr);
+				{
+					_stage_ps->proccess(vr);
+					_stage_om->proccess(vr, *(_color_buffer), *(_depth_buffer));
+				}
 
 			}
-#endif
 
 
 		}
@@ -525,19 +530,14 @@ void SrRasterizer::triangle_setup(std::vector<SrTriangle*> _triangles, std::vect
 				RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
 				continue;
 
-
-			float ym, xm, zm,
-				yu, xu, zu,
-				yd, xd, zd;
-
 			_sort_y(tri);
-			_new_set_tri2(tri, _triangles_fragments);
+			std::vector<SrFragment*> aa;
+			_new_set_tri2(tri,aa);
+			//new_set_tri2(tri,0,0);
 
 		}
-		//delete tri;
 	}
-	//_prof.set_end(0);
-	//_prof.out_put_after_time(20);
+
 #endif
 }
 
@@ -552,8 +552,223 @@ void SrRasterizer::merge(std::vector<SrFragment*>& _triangles_fragments, SrSSBuf
 	_stage_om->proccess(_triangles_fragments, color, depth);
 }
 
-void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* _stage_ps, SrStageOM* _stage_om)
+void SrRasterizer::trangle_setup_gpu(SrTriangle * tri, bool wireframe)
 {
+	if (wireframe)
+	{
+		//把坐标转换到视口
+		tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
+		tri->v[0].position.y = tri->v[0].position.y*0.5*_viewport_h;
+		tri->v[1].position.x = tri->v[1].position.x*0.5*_viewport_w;
+		tri->v[1].position.y = tri->v[1].position.y*0.5*_viewport_h;
+		tri->v[2].position.x = tri->v[2].position.x*0.5*_viewport_w;
+		tri->v[2].position.y = tri->v[2].position.y*0.5*_viewport_h;
+
+		//检测三角形是否退化为直线
+		/*
+		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
+			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
+			return;
+			*/
+
+		auto draw_line = [&](const VertexP3N3T2& a, const VertexP3N3T2& b)->void
+		{
+			int x1 = a.position.x; int y1 = a.position.y;
+			int x2 = b.position.x; int y2 = b.position.y;
+			//参数c为颜色值
+			int dx = abs(x2 - x1), dy = abs(y2 - y1), yy = 0;
+			if (dx < dy)
+			{
+				yy = 1;
+				int temp = x1;
+				x1 = y1;
+				y1 = temp;
+				temp = x2;
+				x2 = y2;
+				y2 = temp;
+				temp = dx;
+				dx = dy;
+				dy = temp;
+			}
+			int ix = (x2 - x1) > 0 ? 1 : -1, iy = (y2 - y1) > 0 ? 1 : -1, cx = x1, cy = y1, n2dy = dy * 2, n2dydx = (dy - dx) * 2, d = dy * 2 - dx;
+			int i = 0;
+			//如果直线与x轴的夹角大于45度  
+			if (yy)
+			{
+				while (cx != x2)
+				{
+					if (d < 0)
+					{
+						d += n2dy;
+					}
+					else
+					{
+						cy += iy;
+						d += n2dydx;
+					}
+					VertexP3N3T2 v;
+					v.position.z = (a.position.z + b.position.z)*0.5f;
+					v.position.x = cy;
+					v.position.y = cx;
+					v.normal = a.normal;
+
+					if (_discard_invisible(v))
+					{
+						_stage_ps->proccess(v);
+						_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+					}
+
+
+					cx += ix;
+					++i;
+				}
+			}
+			//如果直线与x轴的夹角小于45度 
+			else
+			{
+				while (cx != x2)
+				{
+					if (d < 0)
+					{
+						d += n2dy;
+					}
+					else
+					{
+						cy += iy;
+						d += n2dydx;
+					}
+					VertexP3N3T2 v;
+					v.position.z = (a.position.z + b.position.z)*0.5f;
+					v.position.x = cx;
+					v.position.y = cy;
+					v.normal = a.normal;
+
+					if (_discard_invisible(v))
+					{
+						_stage_ps->proccess(v);
+						_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+					}
+
+					cx += ix;
+					++i;
+				}
+			}
+		};
+
+		draw_line(tri->v[0], tri->v[1]);
+		draw_line(tri->v[1], tri->v[2]);
+		draw_line(tri->v[2], tri->v[0]);
+
+
+
+		for (int i = 0; i < 3; ++i)
+		{
+			VertexP3N3T2 &vr = tri->v[i];
+			VertexP3N3T2 v = vr;
+			v.position.x += 1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			v = vr;
+			v.position.x -= 1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			v = vr;
+			v.position.y += 1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			v = vr;
+			v.position.y -= 1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			v = vr;
+			v.position.x += 1;
+			v.position.y += 1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+
+
+			v = vr;
+			v.position.x += -1;
+			v.position.y += -1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			v = vr;
+			v.position.x += -1;
+			v.position.y += 1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			v = vr;
+			v.position.x += 1;
+			v.position.y += -1;
+			if (_discard_invisible(v))
+			{
+				_stage_ps->proccess(v);
+				_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+			}
+
+			if (_discard_invisible(vr))
+			{
+				_stage_ps->proccess(vr);
+				_stage_om->proccess(vr, *(_color_buffer), *(_depth_buffer));
+			}
+
+		}
+
+	}
+	else
+	{
+		//把坐标转换到视口
+		tri->v[0].position.x = tri->v[0].position.x*0.5*_viewport_w;
+		tri->v[0].position.y = tri->v[0].position.y*0.5*_viewport_h;
+		tri->v[1].position.x = tri->v[1].position.x*0.5*_viewport_w;
+		tri->v[1].position.y = tri->v[1].position.y*0.5*_viewport_h;
+		tri->v[2].position.x = tri->v[2].position.x*0.5*_viewport_w;
+		tri->v[2].position.y = tri->v[2].position.y*0.5*_viewport_h;
+
+		//检测三角形是否退化为直线
+
+		if (RBMath::is_nearly_equal(tri->v[0].position.y, tri->v[1].position.y) && RBMath::is_nearly_equal(tri->v[1].position.y, tri->v[2].position.y) ||
+			RBMath::is_nearly_equal(tri->v[0].position.x, tri->v[1].position.x) && RBMath::is_nearly_equal(tri->v[1].position.x, tri->v[2].position.x))
+			return;
+
+		_sort_y(tri);
+		_new_set_tri2(tri);
+		//new_set_tri2(tri, _stage_ps, _stage_om);
+	}
+}
+
+void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* stage_ps, SrStageOM* stage_om)
+{
+	
+
 	//!!!性能issue
 	//SrFragment* frg = new SrFragment();
 	//用于判断左右三角
@@ -656,8 +871,11 @@ void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* _stage_ps, SrStageO
 			ve.normal = _lerp_normal(tri->v[0].normal, p11.normal, t);
 			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
 
-			if (new_scan_line(vs, ve,_stage_ps,_stage_om))
+			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+			{
+				printf("scan a oblique line\n");
 				return;
+			}
 
 			xs += dx_left_02;
 			xe += dx_right_01;
@@ -693,7 +911,10 @@ void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* _stage_ps, SrStageO
 			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
 
 			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+			{
+				printf("scan a oblique line\n");
 				return;
+			}
 
 			xs += dx_left_02;
 			xe += dx_right_12;
@@ -807,7 +1028,10 @@ void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* _stage_ps, SrStageO
 			ve.text_coord = _lerp_uv(tri->v[0].text_coord, tri->v[0].position.w, p11.text_coord, p11.position.w, t);
 
 			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+			{
+				printf("scan a oblique line\n");
 				return;
+			}
 
 			xs += dx_right_02;
 			xe += dx_left_01;
@@ -842,7 +1066,10 @@ void SrRasterizer::new_set_tri2(SrTriangle * tri, SrStagePS* _stage_ps, SrStageO
 			ve.text_coord = _lerp_uv(tri->v[1].text_coord, tri->v[1].position.w, p22.text_coord, p22.position.w, t);
 
 			if (new_scan_line(vs, ve, _stage_ps, _stage_om))
+			{
+				printf("scan a oblique line\n");
 				return;
+			}
 
 			xs += dx_right_02;
 			xe += dx_left_12;
@@ -856,6 +1083,13 @@ bool SrRasterizer::new_scan_line(VertexP3N3T2 & sv, VertexP3N3T2 & ev, SrStagePS
 {
 	sv.position.x = ceil(sv.position.x - 0.5);
 	ev.position.x = ceil(ev.position.x - 0.5);
+	/*
+	if (sv.position.x > ev.position.x)
+	{
+		printf("scan nimabi\n");
+		return false;
+	}
+	*/
 	//RBlog("line\n");
 	if (!RBMath::is_nearly_equal(ev.position.y, sv.position.y))
 		return false;
@@ -1340,7 +1574,7 @@ void SrRasterizer::_new_set_tri(SrTriangle* tri, std::vector<SrFragment*>& _tria
 	_triangles_fragments.push_back(frg);
 }
 
-void SrRasterizer::_new_set_tri2(SrTriangle* tri, std::vector<SrFragment*>& _triangles_fragments)
+void SrRasterizer::_new_set_tri2(SrTriangle* tri)
 {
 	//!!!性能issue
 	//SrFragment* frg = new SrFragment();
@@ -1647,6 +1881,7 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 {
 	sv.position.x = ceil(sv.position.x - 0.5);
 	ev.position.x = ceil(ev.position.x - 0.5);
+
 	//RBlog("line\n");
 	if (!RBMath::is_nearly_equal(ev.position.y, sv.position.y))
 		return false;
@@ -1682,7 +1917,11 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 		//
 		//_total_frag++;
 
-
+		if (_discard_invisible(v))
+		{
+			_stage_ps->proccess(v);
+			_stage_om->proccess(v, *(_color_buffer), *(_depth_buffer));
+		}
 #define OP_
 #ifdef OP
 		if (_last_ts_time < 120)
@@ -1697,7 +1936,7 @@ bool SrRasterizer::scan_line(VertexP3N3T2& sv, VertexP3N3T2& ev)
 #else
 #ifndef TRI
 		if (_discard_invisible(v))
-			_gpu->write_min(v);
+			_gpu->add_task(v);
 #endif
 #endif
 

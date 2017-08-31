@@ -72,18 +72,10 @@ private:
 	SrSSBuffer<RBColor32> _color_buffer;
 	SrSSBuffer<float> _depth_buffer;
 
-
-	//thread
-	std::vector<SrSSBuffer<RBColor32>* > _color_buffers;
-	std::vector<SrSSBuffer<float>* > _depth_buffers;
-
-	//useless
-	SrSSBuffer<RBColor32> _co_color_buffer;
-	SrSSBuffer<float> _co_depth_buffer;
-
 	//origin
 	SrSSBuffer<RBColor32> _o_color_buffer;
 	SrSSBuffer<float> _o_depth_buffer;
+
 	RBD3D11Texture2D* _out_tex;
 
 	//threads

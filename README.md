@@ -132,11 +132,15 @@ Note
 Rencently TODO
 =========
 
--   完全重写多线程部分!
+-   裁剪有bug，参考神庙场景
+-   效率优化，线扫方法，神庙全纹理，基本着色器，起码20fps!参考[https://github.com/gameknife/SoftRenderer](https://github.com/gameknife/SoftRenderer)
 -   整理重构！
+
+Future TODE
+=========
+
 -	**实用性改善！** ：**等价的并行架构，可以用于在CPU上等价模拟DirectCompute计算。**
 -   **完善基本的管线，按照标准的现代管线完善，clipping space，clipping等等，标准API**
--   完善帧率太低就直接discard，并且记录下来的功能（这个功能当前是在fragment里面做的，效果还不是很好）
 -   SIMD加速，单独编译的Shader
 -   CommandQueue
 -   Blending
